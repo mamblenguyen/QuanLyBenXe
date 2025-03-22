@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "class_code": "A001",
+    "subject": "Toán",
+    "content": "Kiểm tra giữa kỳ",
+    "date": "19/08/2020",
+    "duration": 90,
+    "teacher": "Nguyễn Văn A",
+    "status": "upcoming",
+    "action": "Start"
+  },
+  {
+    "id": 2,
+    "class_code": "B002",
+    "subject": "Văn",
+    "content": "Bài luận văn học",
+    "date": "21/08/2020",
+    "duration": 120,
+    "teacher": "Trần Thị B",
+    "status": "completed",
+    "action": "Completed"
+  },
+  {
+    "id": 3,
+    "class_code": "C003",
+    "subject": "Anh Văn",
+    "content": "Kiểm tra từ vựng",
+    "date": "23/08/2020",
+    "duration": 60,
+    "teacher": "Lê Văn C",
+    "status": "incomplete",
+    "action": "Not Submitted"
+  },
+  {
+    "id": 4,
+    "class_code": "D004",
+    "subject": "Lý",
+    "content": "Bài kiểm tra chương 2",
+    "date": "25/08/2020",
+    "duration": 75,
+    "teacher": "Phạm Minh D",
+    "status": "upcoming",
+    "action": "Start"
+  },
+  {
+    "id": 5,
+    "class_code": "E005",
+    "subject": "Hóa",
+    "content": "Thực hành hóa học",
+    "date": "27/08/2020",
+    "duration": 90,
+    "teacher": "Đỗ Thị E",
+    "status": "completed",
+    "action": "Completed"
+  },
+  {
+    "id": 6,
+    "class_code": "F006",
+    "subject": "Sinh học",
+    "content": "Trắc nghiệm sinh lý",
+    "date": "29/08/2020",
+    "duration": 60,
+    "teacher": "Lý Văn F",
+    "status": "upcoming",
+    "action": "Start"
+  },
+  {
+    "id": 7,
+    "class_code": "G007",
+    "subject": "Tin học",
+    "content": "Kiểm tra lập trình C++",
+    "date": "30/08/2020",
+    "duration": 120,
+    "teacher": "Ngô Minh G",
+    "status": "incomplete",
+    "action": "Not Submitted"
+  },
+  {
+    "id": 8,
+    "class_code": "H008",
+    "subject": "Địa lý",
+    "content": "Bài tập bản đồ",
+    "date": "31/08/2020",
+    "duration": 90,
+    "teacher": "Lê Thị H",
+    "status": "completed",
+    "action": "Completed"
+  },
+  {
+    "id": 9,
+    "class_code": "I009",
+    "subject": "Lịch sử",
+    "content": "Trắc nghiệm lịch sử thế giới",
+    "date": "01/09/2020",
+    "duration": 80,
+    "teacher": "Hoàng Văn I",
+    "status": "upcoming",
+    "action": "Start"
+  },
+  {
+    "id": 10,
+    "class_code": "J010",
+    "subject": "GDCD",
+    "content": "Bài tập tình huống pháp luật",
+    "date": "02/09/2020",
+    "duration": 100,
+    "teacher": "Đặng Thị J",
+    "status": "completed",
+    "action": "Completed"
+  }
+]

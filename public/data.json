@@ -1,0 +1,92 @@
+{
+  "ToBoMon": [
+    { "id": 0, "value": "Toán - Lý - Hóa" },
+    { "id": 1, "value": "Sinh - Sử - Địa" },
+    { "id": 2, "value": "Văn - Anh - Anh" },
+    { "id": 3, "value": "Toán - Hóa - Sinh" }
+  ],
+  "MonGiangDay": [
+    { "id": 0, "value": "Toán" },
+    { "id": 1, "value": "Sinh" },
+    { "id": 2, "value": "Văn" },
+    { "id": 3, "value": "Lý" }
+  ],
+  "DanToc": [
+    { "id": 0, "value": "Kinh" },
+    { "id": 1, "value": "Mèo" },
+    { "id": 2, "value": "H - Mông" },
+    { "id": 3, "value": "Tày" }
+  ],
+  "QuocTich": [
+    { "id": 0, "value": "Việt Nam" },
+    { "id": 1, "value": "Mỹ" },
+    { "id": 2, "value": "Canada" },
+    { "id": 3, "value": "Singapore" }
+  ],
+  "TonGiao": [
+    { "id": 0, "value": "Phật giáo" },
+    { "id": 1, "value": "Công giáo" },
+    { "id": 2, "value": "Đạo hồi" }
+  ],
+  "TrangThai": [
+    { "id": 0, "value": "Đang giảng dạy" },
+    { "id": 1, "value": "Tạm nghỉ" },
+    { "id": 2, "value": "Đã thôi việc" },
+    { "id": 3, "value": "Nghỉ hưu" }
+  ],
+  "TinhThanh": [
+    { "id": 0, "value": "TP - Hồ Chí Minh " },
+    { "id": 1, "value": "Bến Tre" },
+    { "id": 2, "value": "Cao Bằng" },
+    { "id": 3, "value": "Bảo Lộc" }
+  ],
+  "XaPhuong": [
+    { "id": 0, "value": "Phường 1" },
+    { "id": 1, "value": "Phường 2" },
+    { "id": 2, "value": "Phường 3" },
+    { "id": 3, "value": "Phường 4" }
+  ],
+  "QuanHuyen": [
+    { "id": 0, "value": "Quận 1" },
+    { "id": 1, "value": "Quận 2" },
+    { "id": 2, "value": "Quận 3" },
+    { "id": 3, "value": "Quận 4" }
+  ],
+  "GioiTinh": [
+    { "id": 0, "value": "Nam" },
+    { "id": 1, "value": "Nữ" },
+    { "id": 2, "value": "Khác" }
+  ],
+  "Contact": [
+    {
+      "id": 1,
+      "name": "Nguyễn Văn A",
+      "address": "Hà Nội",
+      "phone": "0123 456 789"
+    },
+    {
+      "id": 2,
+      "name": "Trần Thị B",
+      "address": "TP. Hồ Chí Minh",
+      "phone": "0987 654 321"
+    },
+    {
+      "id": 3,
+      "name": "Lê Văn C",
+      "address": "Đà Nẵng",
+      "phone": "0345 678 910"
+    },
+    {
+      "id": 4,
+      "name": "Phạm Thị D",
+      "address": "Cần Thơ",
+      "phone": "0765 432 198"
+    },
+    {
+      "id": 5,
+      "name": "Hoàng Minh E",
+      "address": "Hải Phòng",
+      "phone": "0912 345 678"
+    }
+  ]
+}

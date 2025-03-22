@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "subject": "Toán",
+    "content": "Kiểm tra giữa kỳ",
+    "teacher": "Nguyễn Văn A",
+    "date": "2025-04-10",
+    "duration": "60 phút",
+    "status": "upcoming"
+  },
+  {
+    "id": 2,
+    "subject": "Văn",
+    "content": "Kiểm tra 15 phút",
+    "teacher": "Trần Thị B",
+    "date": "2025-03-15",
+    "duration": "15 phút",
+    "status": "completed"
+  },
+  {
+    "id": 3,
+    "subject": "Lý",
+    "content": "Kiểm tra cuối kỳ",
+    "teacher": "Lê Văn C",
+    "date": "2025-05-01",
+    "duration": "90 phút",
+    "status": "upcoming"
+  },
+  {
+    "id": 4,
+    "subject": "Anh",
+    "content": "Kiểm tra miệng",
+    "teacher": "Phạm Thị D",
+    "date": "2025-02-20",
+    "duration": "N/A",
+    "status": "completed"
+  }
+]

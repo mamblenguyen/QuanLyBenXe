@@ -1,0 +1,22 @@
+@import '../../styles/font/index.scss'; // Import đúng file SCSS chứa các mixin
+
+.form-title {
+  @include lms-h2-style;
+  text-align: center;
+  font-weight: bolder; // Áp dụng mixin h2 style cho class form-title
+}
+.text-menu {
+  @include lms-menu-style;
+  text-align: left;
+}
+.text-content {
+  @include lms-content-style;
+}
+.text-sub-note {
+  @include lms-sub-content;
+  color: #cc5c00;
+  font-size: 1.2em;
+}
+.text-note {
+  @include lms-note-style;
+}

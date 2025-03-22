@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "sender": "Học sinh A",
+    "avatar": "https://i.pravatar.cc/40?u=1",
+    "message": "Thầy ơi, bài tập này làm sao ạ?",
+    "views": 120,
+    "time": "2025-03-07T10:30:00",
+    "answered": true,
+    "answer": "Bài tập này làm theo công thức A + B = C nhé!"
+  },
+  {
+    "id": 2,
+    "sender": "Học sinh B",
+    "avatar": "https://i.pravatar.cc/40?u=2",
+    "message": "Cách giải bài số 5 như thế nào vậy thầy?",
+    "views": 85,
+    "time": "2024-03-06T10:45:00",
+    "answered": false,
+    "answer": null
+  },
+  {
+    "id": 3,
+    "sender": "Học sinh C",
+    "avatar": "https://i.pravatar.cc/40?u=3",
+    "message": "Khi nào có bài kiểm tra ạ?",
+    "views": 190,
+    "time": "2024-03-06T11:00:00",
+    "answered": true,
+    "answer": "Bài kiểm tra sẽ diễn ra vào tuần sau."
+  },
+  {
+    "id": 4,
+    "sender": "Học sinh D",
+    "avatar": "https://i.pravatar.cc/40?u=4",
+    "message": "Thầy có thể giải bài tập 7 giúp em không?",
+    "views": 60,
+    "time": "2024-03-07T11:15:00",
+    "answered": false,
+    "answer": null
+  }
+]

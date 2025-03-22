@@ -1,0 +1,41 @@
+
+@import './color';
+
+:root {
+  --black-text: #{$black-text};
+  --while-text: #{$while-text};
+  --blue-text: #{$blue-text};
+  --orange-text: #{$orange-text};
+  --green-text: #{$green-text};
+  --grey-text: #{$grey-text};
+  // status
+  --red-status: #{$red-status};
+  --blue-status: #{$blue-status};
+  --green-statu: #{$green-status};
+  // background
+  --background-1: #{$background-1};
+  --background-2: #{$background-2};
+  --background-3: #{$background-3};
+  --background-4: #{$background-4};
+  --background-5: #{$background-5};
+  --background-6: #{$background-6};
+  --background-7: #{$background-7};
+  --background-8: #{$background-8};
+
+  --background-gray: #{$background-2};
+  --background-orange-1: #{$background-orange-1};
+  --background-orange-2: #{$background-orange-2};
+  --background-orange-3: #{$background-orange-3};
+  --background-blue-1: #{$background-blue-1};
+  --background-blue-2: #{$background-blue-2};
+  --background-blue-3: #{$background-blue-3};
+  --background-green: #{$background-green};
+  --background-while: #{$background-while};
+  --background-input: #{$background-input};
+  // border
+  --border-orange: #{$border-orange};
+  // icon
+  --icon-color: #{$icon-color};
+  // user
+  --user-color: #{$user-color};
+}

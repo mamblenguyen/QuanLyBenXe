@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+h1 {
+  @apply font-mulish text-[48px] leading-[56px] tracking-[0.015em] text-left;
+  text-underline-position: from-font;
+  -webkit-text-decoration-skip-ink: none;
+          text-decoration-skip-ink: none;
+}
+
+h2 {
+  @apply font-mulish text-[28px] leading-[32px] tracking-[0.015em] text-left;
+  text-underline-position: from-font;
+  -webkit-text-decoration-skip-ink: none;
+          text-decoration-skip-ink: none;
+}
+
+.sub-header-1 {
+  @apply font-mulish text-[22px] leading-[26px] tracking-[0.015em] text-left;
+  text-underline-position: from-font;
+  -webkit-text-decoration-skip-ink: none;
+          text-decoration-skip-ink: none;
+}
+
+.sub-header-2 {
+  @apply font-mulish text-[18px] leading-[21.09px] tracking-[0.015em] text-left;
+  text-underline-position: from-font;
+  -webkit-text-decoration-skip-ink: none;
+          text-decoration-skip-ink: none;
+}
+
+.menu-style {
+  @apply font-source-sans text-[16px] font-bold leading-[20.11px] tracking-[0.015em] text-left;
+  text-underline-position: from-font;
+  -webkit-text-decoration-skip-ink: none;
+          text-decoration-skip-ink: none;
+}
+
+.sub-content {
+  @apply font-source-sans text-[16px] font-[600] leading-[20.11px] text-left;
+  text-underline-position: from-font;
+  -webkit-text-decoration-skip-ink: none;
+          text-decoration-skip-ink: none;
+}
+
+.content-style {
+  @apply font-source-sans text-[16px] font-[600] leading-[20.11px] text-left;
+  text-underline-position: from-font;
+  -webkit-text-decoration-skip-ink: none;
+          text-decoration-skip-ink: none;
+}
+
+.status-style {
+  @apply font-source-sans text-[16px] font-[600] leading-[20.11px] text-left;
+  text-underline-position: from-font;
+  -webkit-text-decoration-skip-ink: none;
+          text-decoration-skip-ink: none;
+}
+
+.note-style {
+  @apply font-source-sans text-[14px] italic font-normal leading-[17.6px] text-left;
+  text-underline-position: from-font;
+  -webkit-text-decoration-skip-ink: none;
+          text-decoration-skip-ink: none;
+}/*# sourceMappingURL=index.css.map */

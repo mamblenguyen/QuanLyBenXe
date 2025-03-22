@@ -1,0 +1,46 @@
+.subject-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  font-size: 16px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  margin: 4px;
+  outline: none;
+  transition: background-color 0.3s ease;
+}
+
+.subject-button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.subject-button.disabled {
+  background-color: #dcdcdc;
+  color: #8c8c8c;
+  cursor: not-allowed;
+}
+
+.subject-button .remove-icon {
+  margin-left: 8px;
+  color: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* .subject-button .remove-icon:hover {
+  color: red;
+} */
+
+/* Size */
+.subject-button.small {
+  padding: 4px 12px;
+  font-size: 12px;
+}
+
+.subject-button.large {
+  padding: 8px 16px;
+  font-size: 16px;
+}
