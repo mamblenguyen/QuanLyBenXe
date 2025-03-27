@@ -1,0 +1,78 @@
+{
+  "code": 200,
+  "message": "Get all users successfully !!",
+  "data": [
+    {
+      "id": "40d9c1eb-7dd5-4676-b9b4-f14465a55a3b",
+      "name": "Admin",
+      "email": "Admin1@gmail.com",
+      "created_at": "2024-10-16 10:45:12",
+      "updated_at": "2024-10-16 10:45:12",
+      "roles": [
+        { "id": 1, "name": "Admin" },
+        { "id": 2, "name": "Traffic" },
+        { "id": 3, "name": "Staff" }
+      ],
+      "garage": {
+        "id": 2,
+        "name": "Nhà xe Quốc Bảo",
+        "tax_code": "0312345678",
+        "address": "Số 12 Đường Trần Hưng Đạo, Long Xuyên, An Giang",
+        "phone": "0296 3852 053"
+      }
+    },
+    {
+      "id": "5beaeb2b-f74d-4d0d-80d1-e624c4ec0452",
+      "name": "nguyen.van.b",
+      "email": "nguyen.van.b@example.com",
+      "created_at": "2024-10-04 11:46:30",
+      "updated_at": "2024-10-16 12:12:01",
+      "roles": [
+        { "id": 1, "name": "Admin" },
+        { "id": 2, "name": "Traffic" },
+        { "id": 3, "name": "Staff" }
+      ],
+      "garage": {
+        "id": 2,
+        "name": "Nhà xe Quốc Bảo",
+        "tax_code": "0312345678",
+        "address": "Số 12 Đường Trần Hưng Đạo, Long Xuyên, An Giang",
+        "phone": "0296 3852 053"
+      }
+    },
+    {
+      "id": "654f27ad-842b-4c51-873f-466d0f522220",
+      "name": "nguyen.van.a",
+      "email": "nguyen.van.a@example.com",
+      "created_at": "2024-10-16 12:03:39",
+      "updated_at": "2024-10-16 12:03:39",
+      "roles": [
+        { "id": 1, "name": "Admin" },
+        { "id": 2, "name": "Traffic" },
+        { "id": 3, "name": "Staff" }
+      ],
+      "garage": {
+        "id": 2,
+        "name": "Nhà xe Quốc Bảo",
+        "tax_code": "0312345678",
+        "address": "Số 12 Đường Trần Hưng Đạo, Long Xuyên, An Giang",
+        "phone": "0296 3852 053"
+      }
+    },
+    {
+      "id": "74565030-1d12-4195-b34d-f5d11620ba86",
+      "name": "User3",
+      "email": "admin@gmail.com",
+      "created_at": "2024-10-16 10:43:40",
+      "updated_at": "2024-10-16 10:43:40",
+      "roles": [],
+      "garage": {
+        "id": 2,
+        "name": "Nhà xe Quốc Bảo",
+        "tax_code": "0312345678",
+        "address": "Số 12 Đường Trần Hưng Đạo, Long Xuyên, An Giang",
+        "phone": "0296 3852 053"
+      }
+    }
+  ]
+}

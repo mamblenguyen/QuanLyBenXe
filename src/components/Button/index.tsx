@@ -3,17 +3,17 @@ import { ButtonProps } from './type';
 
 const Button: React.FC<ButtonProps> = ({
   label, // Nội dung hiển thị trên nút
-  size = 'medium', // Kích thước của nút (big, medium, mini), mặc định là 'medium'
-  variant = 'solid', // Kiểu dáng của nút (solid, outline, ghost, none), mặc định là 'solid'
-  disabled = false, // Trạng thái vô hiệu hóa (true/false), mặc định là false
-  icon, // Biểu tượng hiển thị trên nút (nếu có)
-  iconPosition = 'left', // Vị trí của biểu tượng ('left' hoặc 'right'), mặc định là 'left'
-  onClick, // Hàm xử lý khi người dùng click vào nút
-  textColor, // Màu chữ của nút (tùy chỉnh)
-  backgroundColor, // Màu nền của nút (tùy chỉnh)
-  border, // Viền của nút (tùy chỉnh)
-  hoverBackgroundColor, // Màu nền khi hover (tùy chỉnh)
-  hoverCursor = 'pointer', // Kiểu con trỏ khi hover, mặc định là 'pointer'
+  size = 'medium', // Kích thước của nút
+  variant = 'solid', // Kiểu dáng của nút
+  disabled = false, // Trạng thái vô hiệu hóa
+  icon, // Biểu tượng
+  iconPosition = 'left', // Vị trí của biểu tượng ('left' hoặc 'right')
+  onClick, // Sự kiện click
+  textColor, // Màu chữ
+  backgroundColor, // Màu nền
+  border, // Viền
+  hoverBackgroundColor, // Màu nền khi hover
+  hoverCursor = 'pointer', // Kiểu con trỏ khi hover
 }) => {
   const baseClasses = `inline-flex items-center justify-center font-bold transition-all duration-300 px-4`;
 
@@ -24,11 +24,11 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   const variantClasses = {
-    solid: 'bg-[#ff7506] text-white border-none hover:bg-[#e06504]',
-    outline: 'bg-transparent text-[#ff7506] border-2 border-[#ff7506] hover:bg-[rgba(255,117,6,0.1)] hover:text-white',
-    ghost: 'bg-transparent text-[#ff7506] border-none hover:bg-[rgba(255,117,6,0.1)]',
+    solid: 'bg-[#1D4ED8] text-white border-none hover:bg-[#2563EB]',
+    outline: 'bg-transparent text-[#1D4ED8] border-2 border-[#1D4ED8] hover:bg-[rgba(29,78,216,0.1)] hover:text-[#1D4ED8]',
+    ghost: 'bg-transparent text-[#1D4ED8] border-none hover:bg-[rgba(29,78,216,0.1)]',
     none: 'bg-transparent text-inherit border-none',
-    disabled: 'bg-[#e0e0e0] text-[#c9c4c0] cursor-not-allowed',
+    disabled: 'bg-[#E0E0E0] text-[#A0A0A0] cursor-not-allowed',
   };
 
   const customStyles = {
