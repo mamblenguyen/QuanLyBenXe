@@ -1,5 +1,7 @@
-import React from 'react';
-import { Outlet } from 'react-router-dom';
+import React from "react";
+import { Outlet } from "react-router-dom";
+import { LoadingProvider } from "../../context/loading";
+import { Toaster } from "react-hot-toast";
 
 interface LayoutWrapperProps {
   layout: React.ComponentType<{ children: React.ReactNode }>;
@@ -7,9 +9,12 @@ interface LayoutWrapperProps {
 
 const LayoutWrapper: React.FC<LayoutWrapperProps> = ({ layout: Layout }) => {
   return (
-    <Layout>
-      <Outlet />
-    </Layout>
+    <LoadingProvider>
+      <Toaster position="top-right" reverseOrder={false} />
+      <Layout>
+        <Outlet />
+      </Layout>
+    </LoadingProvider>
   );
 };
 

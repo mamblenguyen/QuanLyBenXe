@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { FaSearch, FaEye, FaEdit, FaTrash, FaUserPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import apiInstance from "../../../../services/api";
+import { useLoading } from "../../../../context/loading";
 
 interface Role {
     id: number;
@@ -31,31 +33,29 @@ const roleMapping: Record<string, string> = {
 };
 
 const UserList: React.FC = () => {
+    const { setLoading } = useLoading();
     const [users, setUsers] = useState<User[]>([]);
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchClassOptions = async () => {
             try {
-                const response = await fetch("/data/users.json");
-                if (!response.ok) throw new Error("Không thể tải dữ liệu");
-                const jsonData = await response.json();
-
-                if (jsonData.code === 200 && Array.isArray(jsonData.data)) {
-                    setUsers(jsonData.data);
-                    setFilteredUsers(jsonData.data);
+                setLoading(true);
+                const response = await apiInstance.get('api/system/user/list/');
+                if (response.data.code === 200) {
+                    setUsers(response.data.data);
                 } else {
-                    throw new Error("Dữ liệu API không hợp lệ");
+                    console.error('Error fetching classes:', response.data.message);
                 }
             } catch (error) {
-                console.error("Lỗi tải danh sách người dùng:", error);
+                console.error('API Error:', error);
+            } finally {
+                setLoading(false);
             }
         };
-
-        fetchUsers();
+        fetchClassOptions();
     }, []);
-
     useEffect(() => {
         const filtered = users.filter(
             (user) =>
