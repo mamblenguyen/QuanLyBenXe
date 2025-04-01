@@ -6,7 +6,7 @@ import backgroundImage from '../../../assets/images/leadershipbg.jpg';
 interface LeadershipLayoutProps {
   children?: React.ReactNode;
 }
-const LeadershipLayout = ({ children }: LeadershipLayoutProps) => {
+const AdminLayout = ({ children }: LeadershipLayoutProps) => {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -39,4 +39,4 @@ const LeadershipLayout = ({ children }: LeadershipLayoutProps) => {
   );
 };
 
-export default LeadershipLayout;
+export default AdminLayout;

@@ -1,0 +1,101 @@
+{
+  "code": 200,
+  "message": "Get all buses successfully !!",
+  "data": [
+    {
+      "id": 1,
+      "bus_number": "BUS001",
+      "model": {
+        "id": 1,
+        "name": "Xe giường nấm",
+        "capacity": 50
+      },
+      "garage": {
+        "id": 2,
+        "name": "Nhà xe Quốc Bảo",
+        "tax_code": "0312345678",
+        "address": "Số 12 Đường Trần Hưng Đạo, Long Xuyên, An Giang",
+        "phone": "0296 3852 053"
+      },
+      "images": ["bus001_1.jpg", "bus001_2.jpg", "bus001_3.jpg", "bus001_4.jpg", "bus001_5.jpg", "bus001_6.jpg"],
+      "created_at": "2024-10-04 11:46:31",
+      "updated_at": "2024-10-04 11:46:31"
+    },
+    {
+      "id": 2,
+      "bus_number": "BUS002",
+      "model": {
+        "id": 2,
+        "name": "Xe Limmousin",
+        "capacity": 40
+      },
+      "garage": {
+        "id": 2,
+        "name": "Nhà xe Quốc Bảo",
+        "tax_code": "0312345678",
+        "address": "Số 12 Đường Trần Hưng Đạo, Long Xuyên, An Giang",
+        "phone": "0296 3852 053"
+      },
+      "images": ["bus002_1.jpg", "bus002_2.jpg", "bus002_3.jpg", "bus002_4.jpg", "bus002_5.jpg", "bus002_6.jpg"],
+      "created_at": "2024-10-04 11:46:31",
+      "updated_at": "2024-10-04 11:46:31"
+    },
+    {
+      "id": 6,
+      "bus_number": "ABC-123",
+      "model": {
+        "id": 1,
+        "name": "Xe giường nấm",
+        "capacity": 50
+      },
+      "garage": {
+        "id": 2,
+        "name": "Nhà xe Quốc Bảo",
+        "tax_code": "0312345678",
+        "address": "Số 12 Đường Trần Hưng Đạo, Long Xuyên, An Giang",
+        "phone": "0296 3852 053"
+      },
+      "images": ["abc123_1.jpg", "abc123_2.jpg", "abc123_3.jpg", "abc123_4.jpg", "abc123_5.jpg", "abc123_6.jpg"],
+      "created_at": "2024-10-16 13:00:41",
+      "updated_at": "2024-10-16 13:00:41"
+    },
+    {
+      "id": 8,
+      "bus_number": "XYZ-1234",
+      "model": {
+        "id": 2,
+        "name": "Xe Limmousin",
+        "capacity": 40
+      },
+      "garage": {
+        "id": 2,
+        "name": "Nhà xe Quốc Bảo",
+        "tax_code": "0312345678",
+        "address": "Số 12 Đường Trần Hưng Đạo, Long Xuyên, An Giang",
+        "phone": "0296 3852 053"
+      },
+      "images": ["xyz1234_1.jpg", "xyz1234_2.jpg", "xyz1234_3.jpg", "xyz1234_4.jpg", "xyz1234_5.jpg", "xyz1234_6.jpg"],
+      "created_at": "2024-10-16 14:01:25",
+      "updated_at": "2024-10-16 14:01:25"
+    },
+    {
+      "id": 9,
+      "bus_number": "XYZ-12345",
+      "model": {
+        "id": 2,
+        "name": "Xe Limmousin",
+        "capacity": 40
+      },
+      "garage": {
+        "id": 2,
+        "name": "Nhà xe Quốc Bảo",
+        "tax_code": "0312345678",
+        "address": "Số 12 Đường Trần Hưng Đạo, Long Xuyên, An Giang",
+        "phone": "0296 3852 053"
+      },
+      "images": ["xyz12345_1.jpg", "xyz12345_2.jpg", "xyz12345_3.jpg", "xyz12345_4.jpg", "xyz12345_5.jpg", "xyz12345_6.jpg"],
+      "created_at": "2025-03-22 13:11:18",
+      "updated_at": "2025-03-22 13:11:18"
+    }
+  ]
+}
