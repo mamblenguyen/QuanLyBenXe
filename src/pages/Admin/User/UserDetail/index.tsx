@@ -1,35 +1,42 @@
+import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { Camera, Trash2 } from "lucide-react";
+import apiInstance from "../../../../services/api";
+import { useParams } from "react-router";
 
 const roleMapping: Record<string, string> = {
     Admin: "Quản trị",
     Traffic: "Tài xế",
-    Staff: "Nhân viên bán vé",
-};
-
-// 🔹 Giả lập dữ liệu user
-const user = {
-    id: "NVBX12345",
-    name: "Nguyễn Văn A",
-    birthday: "05/06/1985",
-    gender: "Nam",
-    phone: "0901234567",
-    email: "nguyenvana@benxe.vn",
-    avatar: "https://via.placeholder.com/150",
-    roles: ["Admin", "Traffic"], // Người này có 2 vai trò: Admin & Tài xế
-    address: "123 Đường ABC, Quận 1, TP.HCM",
-    identityCard: "123456789012",
-    identityIssuePlace: "Công an TP.HCM",
-    identityIssueDate: "10/09/2010",
-    status: "Đang hoạt động",
-    vehicle: "51B-12345",
-    route: "Cần Thơ - TP.HCM",
-    license: "Hạng E",
-    licenseIssueDate: "15/08/2015",
-    licenseExpiryDate: "15/08/2025",
+    Staff: "Nhân viên",
 };
 
 const UserDetail = () => {
+    const [user, setUser] = useState<any>(null); // State to store user data
+    const [loading, setLoading] = useState<boolean>(true); // State for loading status
+    const id = useParams();
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                setLoading(true);
+                const response = await apiInstance.get(`/api/system/user/users/${id?.id}`);
+                if (response.data.code === 200) {
+                    setUser(response.data.data);
+                } else {
+                    console.error('Error fetching classes:', response.data.message);
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUser();
+    }, []);
+
+    if (loading) {
+        return <div>Loading...</div>; // Display a loading state
+    }
+
     return (
         <div className="px-5">
             <div className="flex items-center space-x-5 mb-9">
@@ -60,7 +67,7 @@ const UserDetail = () => {
                     <div className="flex flex-col items-center">
                         <div className="relative w-36 h-36">
                             <img
-                                src={user.avatar}
+                                src={user.avatar || "https://via.placeholder.com/150"} // Fallback to placeholder if avatar is missing
                                 alt="Người dùng"
                                 className="w-full h-full rounded-full border-2 border-gray-300"
                             />
@@ -76,7 +83,7 @@ const UserDetail = () => {
                         <div className="space-y-2">
                             <div className="flex items-center">
                                 <label className="w-32 text-sm font-medium">Mã nhân viên:</label>
-                                <span className="text-sm font-normal">{user.id}</span>
+                                <span title={user.id} className="text-sm font-normal">{(user.id.substring(0, 10))}...</span>
                             </div>
                             <div className="flex items-center">
                                 <label className="w-32 text-sm font-medium">Họ và tên:</label>
@@ -96,15 +103,15 @@ const UserDetail = () => {
                             </div>
                             <div className="flex items-center">
                                 <label className="w-32 text-sm font-medium">Số CCCD:</label>
-                                <span className="text-sm font-normal">{user.identityCard}</span>
+                                <span className="text-sm font-normal">{user.identity_card}</span>
                             </div>
                             <div className="flex items-center">
                                 <label className="w-32 text-sm font-medium">Nơi cấp:</label>
-                                <span className="text-sm font-normal">{user.identityIssuePlace}</span>
+                                <span className="text-sm font-normal">{user.identity_issue_place}</span>
                             </div>
                             <div className="flex items-center">
                                 <label className="w-32 text-sm font-medium">Ngày cấp:</label>
-                                <span className="text-sm font-normal">{user.identityIssueDate}</span>
+                                <span className="text-sm font-normal">{user.identity_issue_date}</span>
                             </div>
                         </div>
                     </div>
@@ -117,27 +124,43 @@ const UserDetail = () => {
                             <div className="flex items-center">
                                 <label className="w-32 text-sm font-medium">Vai trò:</label>
                                 <div className="flex space-x-2">
-                                    {user.roles.map((role) => (
+                                    {user.roles.map((role: { name: string }) => (
                                         <span
-                                            key={role}
+                                            key={role.name}
                                             className="bg-blue-200 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full"
                                         >
-                                            {roleMapping[role]}
+                                            {roleMapping[role.name]}
                                         </span>
                                     ))}
                                 </div>
                             </div>
+                            <div className="flex items-center">
+                                <label className="w-32 text-sm font-medium">Tình trạng:</label>
+                                <div className="flex space-x-2">
+                                    <span
+                                        className={
+                                            user.status === "Đang hoạt động"
+                                                ? "text-green-500"
+                                                : user.status === "Tạm dừng"
+                                                    ? "text-yellow-500"
+                                                    : "text-gray-500"
+                                        }
+                                    >
+                                        {user.status}
+                                    </span>
+                                </div>
+                            </div>
 
                             {/* 🔸 Nếu có vai trò Tài xế thì hiển thị thông tin liên quan */}
-                            {user.roles.includes("Traffic") && (
+                            {user.roles.some((role: { name: string }) => role.name === "Traffic") && (
                                 <>
                                     <div className="flex items-center">
                                         <label className="w-32 text-sm font-medium">Số xe:</label>
-                                        <span className="text-sm font-normal">{user.vehicle}</span>
+                                        <span className="text-sm font-normal">Xe Cũ</span>
                                     </div>
                                     <div className="flex items-center">
                                         <label className="w-32 text-sm font-medium">Tuyến xe:</label>
-                                        <span className="text-sm font-normal">{user.route}</span>
+                                        <span className="text-sm font-normal">A - B</span>
                                     </div>
                                     <div className="flex items-center">
                                         <label className="w-32 text-sm font-medium">GPLX:</label>
@@ -145,11 +168,11 @@ const UserDetail = () => {
                                     </div>
                                     <div className="flex items-center">
                                         <label className="w-32 text-sm font-medium">Ngày cấp GPLX:</label>
-                                        <span className="text-sm font-normal">{user.licenseIssueDate}</span>
+                                        <span className="text-sm font-normal">{user.license_issue_date}</span>
                                     </div>
                                     <div className="flex items-center">
                                         <label className="w-32 text-sm font-medium">Ngày hết hạn GPLX:</label>
-                                        <span className="text-sm font-normal">{user.licenseExpiryDate}</span>
+                                        <span className="text-sm font-normal">{user.license_expiry_date}</span>
                                     </div>
                                 </>
                             )}

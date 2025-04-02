@@ -9,12 +9,10 @@ const apiInstance = axios.create({
     baseURL: API_BASE_URL,
     headers: {
         "secretkey": SECRET_KEY,
-        "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL3N5c3RlbS9hdXRoL2xvZ2luIiwiaWF0IjoxNzQzNDI0MTQ4LCJleHAiOjE3NDM0MjU5NDgsIm5iZiI6MTc0MzQyNDE0OCwianRpIjoibHR4YU9qZ3l6QmVmWXlTcSIsInN1YiI6ImI1MGI4NjM4LTk4ODctNGM2OC1hZTdmLWEyMTRiMzdmMmJhZiIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjciLCJpZCI6ImI1MGI4NjM4LTk4ODctNGM2OC1hZTdmLWEyMTRiMzdmMmJhZiIsIm5hbWUiOiJBZG1pbiIsImVtYWlsIjoiQWRtaW4xMjNAZ21haWwuY29tIiwicm9sZXMiOlsiQWRtaW4iLCJUcmFmZmljIiwiU3RhZmYiXSwiZ2FyYWdlIjp7IkdhcmFnZV9pZCI6MywiR2FyYWdlX25hbWUiOiJOaMOgIHhlIE1pbmggVHXhuqVuIn19.Erho2ZTIRvNRrs5kN6rafzmTU5vqfOh8iWVFTfGGlWE",
         "Content-Type": "application/json",
     },
-    withCredentials: false,
-
 });
+
 
 
 apiInstance.interceptors.request.use(

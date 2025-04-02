@@ -1,17 +1,51 @@
 import React, { useState } from 'react';
 import { FaUser, FaShieldAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import apiInstance from '../../../services/api';
+import { setCookie } from 'cookies-next';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: any) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      const { data } = await apiInstance.post("/api/system/auth/login", {
+        name: username,
+        password,
+      });
+      setCookie("access_token", data.token, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 ngày
+        secure: true,
+        sameSite: "strict"
+      });
+
+      setCookie("refresh_token", data.refreshToken, {
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 ngày
+        secure: true,
+        sameSite: "strict"
+      });
+      navigate("/");
+    } catch (error: any) {
+      console.error("Lỗi đăng nhập:", error);
+      setError("Tên đăng nhập hoặc mật khẩu không đúng!");
+    }
+  };
 
   return (
     <div className="w-full max-w-md">
-      {/* Tiêu đề */}
       <h2 className="text-4xl font-bold text-center text-gray-800 mb-6">Đăng nhập</h2>
 
-      {/* Form */}
-      <form>
+      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
+      <form onSubmit={handleLogin}>
         {/* Tên đăng nhập */}
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold mb-2">Tên đăng nhập</label>
@@ -19,38 +53,33 @@ const Login = () => {
             <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">
               <FaUser />
             </span>
-
-            {/* <input
-              type="text"
-              className="w-full pl-10 pr-4 py-2 border border-gray-100 bg-gray-100 rounded-lg focus:bg-white focus:border-black focus:outline-none focus:ring-1 focus:ring-gray-100"
-              autoFocus
-            /> */}
             <input
               type="text"
               className="w-full pl-10 pr-4 py-2 border border-gray-100 bg-gray-100 rounded-lg 
-             focus:bg-white focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-300"
+              focus:bg-white focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-300"
               autoFocus
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
             />
           </div>
         </div>
 
         {/* Mật khẩu */}
-        <div className="mb-4 w-full max-w-[430px] mx-auto">
+        <div className="mb-4">
           <label className="block text-gray-700 font-semibold mb-2">Mật khẩu</label>
           <div className="relative">
-            {/* Icon khóa */}
             <span className="absolute inset-y-0 left-3 flex items-center text-gray-500">
               <FaShieldAlt />
             </span>
-
-            {/* Input mật khẩu */}
             <input
               type={showPassword ? 'text' : 'password'}
               className="w-full pl-10 pr-4 py-2 border border-gray-100 bg-gray-100 rounded-lg 
-             focus:bg-white focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-300"
+              focus:bg-white focus:border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-300"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
-
-            {/* Icon mắt để bật/tắt mật khẩu */}
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
