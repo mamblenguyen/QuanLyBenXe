@@ -3,6 +3,7 @@ import { FaSearch, FaEye, FaEdit, FaTrash, FaUserPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import apiInstance from "../../../../services/api";
 import { useLoading } from "../../../../context/loading";
+import DeletePopup from "../../../../components/Popup/Delete";
 
 interface Role {
     id: number;
@@ -21,11 +22,32 @@ interface User {
     id: string;
     name: string;
     email: string;
+    status: string;
+    phone: string;
     created_at: string;
     roles: Role[];
     garage?: Garage | null;
 }
+const getStatusColor = (statusName: string | null) => {
+    let statusColor = '#000';
 
+    switch (statusName) {
+        case 'Đang hoạt động':
+            statusColor = 'green';
+            break;
+        case 'Tạm dừng':
+            statusColor = 'orange';
+            break;
+        case 'Đã khóa':
+            statusColor = 'red';
+            break;
+        default:
+            statusColor = '#000';
+            break;
+    }
+
+    return statusColor;
+};
 const roleMapping: Record<string, string> = {
     Admin: "Quản trị",
     Traffic: "Tài xế",
@@ -38,15 +60,18 @@ const UserList: React.FC = () => {
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
 
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
     useEffect(() => {
-        const fetchClassOptions = async () => {
+        const fetchUsers = async () => {
             try {
                 setLoading(true);
                 const response = await apiInstance.get('api/system/user/list/');
                 if (response.data.code === 200) {
                     setUsers(response.data.data);
                 } else {
-                    console.error('Error fetching classes:', response.data.message);
+                    console.error('Error fetching users:', response.data.message);
                 }
             } catch (error) {
                 console.error('API Error:', error);
@@ -54,8 +79,9 @@ const UserList: React.FC = () => {
                 setLoading(false);
             }
         };
-        fetchClassOptions();
+        fetchUsers();
     }, []);
+
     useEffect(() => {
         const filtered = users.filter(
             (user) =>
@@ -65,16 +91,24 @@ const UserList: React.FC = () => {
         setFilteredUsers(filtered);
     }, [searchTerm, users]);
 
-    const handleView = (id: string) => {
-        console.log("Xem chi tiết user:", id);
+    const handleDeleteClick = (user: User) => {
+        setSelectedUser(user);
+        setIsPopupOpen(true);
     };
 
-    const handleEdit = (id: string) => {
-        console.log("Chỉnh sửa user:", id);
-    };
+    const handleDeleteConfirm = async () => {
+        if (!selectedUser) return;
 
-    const handleDelete = (id: string) => {
-        console.log("Xóa user:", id);
+        try {
+            setLoading(true);
+            await apiInstance.delete(`api/system/user/users/${selectedUser.id}`);
+            setUsers(users.filter(user => user.id !== selectedUser.id));
+            setIsPopupOpen(false);
+        } catch (error) {
+            console.error("Error deleting user:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -87,7 +121,6 @@ const UserList: React.FC = () => {
                         Thêm User
                     </button>
                 </Link>
-
             </div>
 
             <div className="flex justify-end items-center mb-4">
@@ -109,46 +142,60 @@ const UserList: React.FC = () => {
                         <th className="p-3 text-left">Tên</th>
                         <th className="p-3 text-left">Email</th>
                         <th className="p-3 text-left">Vai trò</th>
-                        <th className="p-3 text-left">Nhà xe</th>
+                        <th className="p-3 text-left">Trạng thái</th>
                         <th className="p-3 text-left">Số điện thoại</th>
                         <th className="p-3 text-center">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     {filteredUsers.length > 0 ? (
-                        filteredUsers.map((user) => (
-                            <tr key={user.id} className="border-b border-gray-200">
-                                <td className="p-3">{user.name}</td>
-                                <td className="p-3">{user.email}</td>
-                                <td className="p-3">
-                                    <div className="flex flex-wrap gap-1">
-                                        {user.roles.map((role) => (
-                                            <span
-                                                key={role.id}
-                                                className="bg-blue-500 text-white px-2 py-1 rounded-lg text-xs font-medium"
+                        filteredUsers.map((user) => {
+                            const statusColor = getStatusColor(user.status); // Use 'user' instead of 'teacher'
+                            return (
+                                <tr key={user.id} className="border-b border-gray-200">
+                                    <td className="p-3">{user.name}</td>
+                                    <td className="p-3">{user.email}</td>
+                                    <td className="p-3">
+                                        <div className="flex flex-wrap gap-1">
+                                            {user.roles.map((role) => (
+                                                <span
+                                                    key={role.id}
+                                                    className="bg-blue-500 text-white px-2 py-1 rounded-lg text-xs font-medium"
+                                                >
+                                                    {roleMapping[role.name] || role.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </td>
+                                    <td className="p-3">
+                                        <div
+                                            className="inline-flex items-center justify-center px-4 py-2 rounded border gap-2 text-[15px] font-medium whitespace-nowrap"
+                                            style={{ color: statusColor, borderColor: statusColor }}
+                                        >
+                                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: statusColor }}></span>
+                                            {user.status}
+                                        </div>
+                                    </td>
+                                    <td className="p-3">{user.phone ? user.phone : "Không có"}</td>
+                                    <td className="p-3 text-center">
+                                        <div className="flex justify-center gap-3">
+                                            <Link to={`detail/${user.id}`} className="text-blue-500 hover:text-blue-700">
+                                                <FaEye size={18} />
+                                            </Link>
+                                            <Link to={`/admin/users/edit/${user.id}`} className="text-yellow-500 hover:text-yellow-700">
+                                                <FaEdit size={18} />
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDeleteClick(user)}
+                                                className="text-red-500 hover:text-red-700"
                                             >
-                                                {roleMapping[role.name] || role.name}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </td>
-                                <td className="p-3">{user.garage ? user.garage.name : "Không có"}</td>
-                                <td className="p-3">{user.garage ? user.garage.phone : "Không có"}</td>
-                                <td className="p-3 text-center">
-                                    <div className="flex justify-center gap-3">
-                                        <Link to={`detail/${user.id}`} className="text-blue-500 hover:text-blue-700">
-                                            <FaEye size={18} />
-                                        </Link>
-                                        <Link to={`/users/edit/${user.id}`} className="text-yellow-500 hover:text-yellow-700">
-                                            <FaEdit size={18} />
-                                        </Link>
-                                        <button onClick={() => handleDelete(user.id)} className="text-red-500 hover:text-red-700">
-                                            <FaTrash size={18} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))
+                                                <FaTrash size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })
                     ) : (
                         <tr>
                             <td colSpan={6} className="p-3 text-center text-gray-500">
@@ -156,8 +203,18 @@ const UserList: React.FC = () => {
                             </td>
                         </tr>
                     )}
+
                 </tbody>
             </table>
+
+            {/* Delete Confirmation Popup */}
+            <DeletePopup
+                isOpen={isPopupOpen}
+                onCancel={() => setIsPopupOpen(false)}
+                onConfirm={handleDeleteConfirm}
+                title="Xác nhận xóa"
+                text={`Bạn có chắc chắn muốn xóa người dùng ${selectedUser?.name}?`}
+            />
         </div>
     );
 };

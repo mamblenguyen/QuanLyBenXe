@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import { Camera, Trash2 } from "lucide-react";
 import apiInstance from "../../../../services/api";
-import { useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
+import DeletePopup from "../../../../components/Popup/Delete";
+import { showToast } from "../../../../components/Toasted";
 
 const roleMapping: Record<string, string> = {
     Admin: "Quản trị",
@@ -14,6 +16,9 @@ const UserDetail = () => {
     const [user, setUser] = useState<any>(null); // State to store user data
     const [loading, setLoading] = useState<boolean>(true); // State for loading status
     const id = useParams();
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const navigate = useNavigate();
+
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -36,6 +41,28 @@ const UserDetail = () => {
     if (loading) {
         return <div>Loading...</div>; // Display a loading state
     }
+    const handleDeleteClick = () => {
+        setIsPopupOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        try {
+            setLoading(true);
+            await apiInstance.delete(`/api/system/user/users/${id?.id}`);
+            showToast("Xóa người dùng thành công!", "success");
+            navigate("/users");
+            setIsPopupOpen(false);
+        } catch (error: any) {
+            if (error.response?.status === 403) {
+                showToast("Bạn không có quyền xóa người dùng này!", "error");
+            } else {
+                console.error("Error deleting user:", error);
+                showToast("Đã xảy ra lỗi khi xóa người dùng!", "error");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="px-5">
@@ -46,13 +73,19 @@ const UserDetail = () => {
             <div className="flex justify-between items-center mb-6">
                 <div></div>
                 <div className="flex items-center space-x-2">
-                    <button>
-                        <Trash2 className="w-8 h-8 text-red-500" />
+                    <button
+                        onClick={handleDeleteClick}
+                        className="text-red-500 hover:text-red-700 disabled:opacity-50"
+                        disabled={loading}
+                    >
+                        <FaTrash size={18} />
                     </button>
                     <span className="text-gray-400">|</span>
                     <button className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-md">
-                        <FaEdit size={18} />
-                        <span>Chỉnh sửa</span>
+                        <Link to={`/admin/users/edit/${user.id}`} className="text-yellow-500 hover:text-yellow-700">
+                            <span className="font-bold text-white">Chỉnh sửa</span>
+
+                        </Link>
                     </button>
                 </div>
             </div>
@@ -71,9 +104,9 @@ const UserDetail = () => {
                                 alt="Người dùng"
                                 className="w-full h-full rounded-full border-2 border-gray-300"
                             />
-                            <button className="absolute bottom--1 left-1/2 transform -translate-x-1/2 bg-gray-400 text-black p-2 rounded-full shadow-lg">
+                            {/* <button className="absolute bottom--1 left-1/2 transform -translate-x-1/2 bg-gray-400 text-black p-2 rounded-full shadow-lg">
                                 <Camera size={16} />
-                            </button>
+                            </button> */}
                         </div>
                     </div>
 
@@ -143,7 +176,9 @@ const UserDetail = () => {
                                                 ? "text-green-500"
                                                 : user.status === "Tạm dừng"
                                                     ? "text-yellow-500"
-                                                    : "text-gray-500"
+                                                    : user.status === "Đã khóa"
+                                                        ? "text-red-500"
+                                                        : "text-gray-500"
                                         }
                                     >
                                         {user.status}
@@ -180,6 +215,13 @@ const UserDetail = () => {
                     </div>
                 </div>
             </div>
+            <DeletePopup
+                isOpen={isPopupOpen}
+                onCancel={() => setIsPopupOpen(false)}
+                onConfirm={handleDeleteConfirm}
+                title="Xác nhận xóa"
+                text="Bạn có chắc chắn muốn xóa người dùng này?"
+            />
         </div>
     );
 };
