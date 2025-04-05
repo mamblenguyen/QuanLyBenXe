@@ -20,7 +20,7 @@ const DeletePopup: React.FC<DeletePopupProps> = ({ isOpen, onCancel, onConfirm, 
           <button className="px-6 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 w-[120px]" onClick={onCancel}>
             Hủy
           </button>
-          <button className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 w-[120px]" onClick={onConfirm}>
+          <button className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-green-600 w-[120px]" onClick={onConfirm}>
             Xác nhận
           </button>
         </div>

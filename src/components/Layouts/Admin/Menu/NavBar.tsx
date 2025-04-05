@@ -6,13 +6,13 @@ const NavBar = ({ collapsed, setCollapsed }: any) => {
 
   const menuItems = [
     { icon: Home, title: 'Tổng quan', link: '/' },
-    { icon: Users, title: 'Người dùng', link: '/users' },
-    { icon: Bus, title: 'Bến xe', link: '/bus-station' },
-    { icon: Car, title: 'Xe', link: '/bus' },
-    { icon: Wrench, title: 'Garage', link: '/garages' },
-    { icon: UserCheck, title: 'Tài xế', link: '/drivers' },
-    { icon: Ticket, title: 'Vé xe', link: '/tickets' },
-    { icon: Map, title: 'Tuyến đường', link: '/routes' },
+    { icon: Users, title: 'Người dùng', link: '/admin/users' },
+    { icon: Bus, title: 'Bến xe', link: '/admin/bus-station' },
+    { icon: Car, title: 'Xe', link: '/admin/bus' },
+    { icon: Wrench, title: 'Garage', link: '/admin/garages' },
+    { icon: UserCheck, title: 'Tài xế', link: '/admin/drivers' },
+    { icon: Ticket, title: 'Vé xe', link: '/admin/tickets' },
+    { icon: Map, title: 'Tuyến đường', link: '/admin/routes' },
   ];
 
   const handleMenuClick = (index: number) => {

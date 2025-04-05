@@ -21,22 +21,22 @@ const AdminRoutes: RouteObject[] = [
     children: [
       //User Route
       { path: '/', element: <Overview /> },
-      { path: '/users', element: <UserList /> },
-      { path: '/users/detail/:id', element: <UserDetail /> },
-      { path: '/users/add', element: <AddUserForm /> },
-      { path: '/users/edit/:id', element: <EditUserForm initialData={{} as any} onSubmit={() => { }} /> },
+      { path: '/admin/users', element: <UserList /> },
+      { path: '/admin/users/detail/:id', element: <UserDetail /> },
+      { path: '/admin/users/add', element: <AddUserForm /> },
+      { path: '/admin/users/edit/:id', element: <EditUserForm /> },
 
       //Bus Station Route
-      { path: '/bus-station', element: <BusStationList /> },
-      { path: '/bus-station/detail/:id', element: <BusStationDetail /> },
-      { path: '/bus-station/add', element: <AddBusStationForm /> },
-      { path: '/bus-station/edit/:id', element: <UpdateBusStationForm /> },
+      { path: '/admin/bus-station', element: <BusStationList /> },
+      { path: '/admin/bus-station/detail/:id', element: <BusStationDetail /> },
+      { path: '/admin/bus-station/add', element: <AddBusStationForm /> },
+      { path: '/admin/bus-station/edit/:id', element: <UpdateBusStationForm /> },
 
       //Bus  Route
-      { path: '/bus', element: <BusList /> },
-      { path: '/bus/detail/:id', element: <BusDetail /> },
-      { path: '/bus/add', element: <AddBusForm /> },
-      { path: '/bus/edit/:id', element: <UpdateBusForm /> },
+      { path: '/admin/bus', element: <BusList /> },
+      { path: '/admin/bus/detail/:id', element: <BusDetail /> },
+      { path: '/admin/bus/add', element: <AddBusForm /> },
+      { path: '/admin/bus/edit/:id', element: <UpdateBusForm /> },
     ],
   },
 ];

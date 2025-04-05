@@ -1,41 +1,66 @@
 import React, { useState } from 'react';
 import { FaUser, FaShieldAlt, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
-import apiInstance from '../../../services/api';
 import { setCookie } from 'cookies-next';
+import apiInstance from '../../../services/api';
+import { jwtDecode } from 'jwt-decode';
 
-const Login = () => {
+interface LoginResponse {
+  data: {
+    token: string;
+  };
+}
+
+interface DecodedToken {
+  name: string;
+  roles: [];
+}
+
+const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async (e: any) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
     try {
-      const { data } = await apiInstance.post("/api/system/auth/login", {
+      const { data }: LoginResponse = await apiInstance.post('/api/system/auth/login', {
         name: username,
         password,
       });
-      setCookie("access_token", data.token, {
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 ngày
+
+      const decodedToken: DecodedToken = jwtDecode(data.token);
+
+      // Set cookies for accessToken, fullname, refreshToken, and role
+      setCookie('access_token', data.token, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
         secure: true,
-        sameSite: "strict"
+        sameSite: 'strict',
+      });
+      setCookie('fullname', decodedToken.name, {
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        secure: true,
+        sameSite: 'strict',
+      });
+      setCookie('refresh_token', data.token, {
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        secure: true,
+        sameSite: 'strict',
+      });
+      setCookie('user_role', decodedToken.roles, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        secure: true,
+        sameSite: 'strict',
       });
 
-      setCookie("refresh_token", data.refreshToken, {
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 ngày
-        secure: true,
-        sameSite: "strict"
-      });
-      navigate("/");
+      navigate('/');
     } catch (error: any) {
-      console.error("Lỗi đăng nhập:", error);
-      setError("Tên đăng nhập hoặc mật khẩu không đúng!");
+      console.error('Lỗi đăng nhập:', error);
+      setError('Tên đăng nhập hoặc mật khẩu không đúng!');
     }
   };
 

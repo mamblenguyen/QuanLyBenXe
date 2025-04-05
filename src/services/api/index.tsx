@@ -3,7 +3,7 @@ import { getCookie, setCookie } from "cookies-next";
 
 const API_BASE_URL = process.env.REACT_APP_BASE_URL || "http://127.0.0.1:8000";
 
-const SECRET_KEY = process.env.REACT_APP_SECRET_KEY || "123456"; // Định nghĩa Secret Key từ .env
+const SECRET_KEY = process.env.REACT_APP_SECRET_KEY || "123456";
 
 const apiInstance = axios.create({
     baseURL: API_BASE_URL,
@@ -18,7 +18,6 @@ const apiInstance = axios.create({
 apiInstance.interceptors.request.use(
     (config) => {
         const token = getCookie("access_token");
-        console.log("Token được gửi:", token);
         if (token) {
             config.headers["Authorization"] = `Bearer ${token}`;
         }
