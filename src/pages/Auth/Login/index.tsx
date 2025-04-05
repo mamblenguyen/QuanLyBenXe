@@ -66,7 +66,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="w-full max-w-md">
-      <h2 className="text-4xl font-bold text-center text-gray-800 mb-6">Đăng nhập</h2>
+      <h2 className="text-4xl font-bold text-center text-gray-800 mb-6">Đăng Nhập</h2>
 
       {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
