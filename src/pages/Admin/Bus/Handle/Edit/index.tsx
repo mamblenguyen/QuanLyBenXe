@@ -1,243 +1,224 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLoading } from "../../../../../context/loading";
+import apiInstance from "../../../../../services/api";
+import Dropdown from "../../../../../components/Dropdown";
+import { showToast } from "../../../../../components/Toasted";
+import { useNavigate, useParams } from "react-router";
 
-interface BusModel {
-    id: number;
-    name: string;
-    capacity: number;
+interface Option {
+    id: string | number;
+    value: string;
+}
+interface OptionBusModel {
+    id: string | number;
+    value: string;
+    capacity?: number;
 }
 
-interface Garage {
-    id: number;
-    name: string;
-    tax_code: string;
-    address: string;
-    phone: string;
-}
+const EditBusForm = () => {
+    const { id } = useParams(); // Lấy id xe từ URL
+    const { setLoading } = useLoading();
+    const navigate = useNavigate();
+    const [busModels, setBusModel] = useState<OptionBusModel[]>([]);
+    const [selectedBusModel, setSelectedBusModel] = useState<OptionBusModel>();
+    const [selectedStatus, setSelectedStatus] = useState<Option | null>(null);
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
 
-interface Bus {
-    id: number;
-    bus_number: string;
-    model: BusModel;
-    garage: Garage;
-    images: string[];
-}
+    const [formData, setFormData] = useState({
+        bus_number: "",
+        model_id: "",
+        status_id: "",
+        images: [] as string[],
+    });
 
-const EditBusForm: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
-    const [formData, setFormData] = useState<Bus | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [newImages, setNewImages] = useState<File[]>([]);
-    const [previewImages, setPreviewImages] = useState<string[]>([]);
+    const status: Option[] = [
+        { id: 1, value: "Đang hoạt động" },
+        { id: 2, value: "Đang sửa chữa" },
+        { id: 3, value: "Tạm ngưng" },
+    ];
 
+    // Lấy thông tin xe cần sửa
     useEffect(() => {
-        if (!id) return;
+        const fetchBusData = async () => {
+            try {
+                setLoading(true);
+                const res = await apiInstance.get(`/api/system/bus/bus/${id}`);
+                const bus = res.data.data;
+                setFormData({
+                    bus_number: bus.bus_number,
+                    model_id: bus.model_id,
+                    status_id: bus.status_id,
+                    images: bus.images || [],
+                });
 
-        fetch("/data/Bus.json")
-            .then((response) => response.json())
-            .then((data) => {
-                console.log("Dữ liệu JSON nhận được:", data);
-                const selectedBus = data.data.find((bus: Bus) => bus.id === Number(id));
+                setSelectedBusModel({
+                    id: bus.model.id,
+                    value: bus.model.name,
+                    capacity: bus.model.capacity,
+                });
 
-                if (selectedBus) {
-                    setFormData({
-                        ...selectedBus,
-                        model: selectedBus.model ?? { id: 0, name: "", capacity: 0 },
-                        garage: selectedBus.garage ?? { id: 0, name: "", tax_code: "", address: "", phone: "" },
-                        images: selectedBus.images ?? [],
-                    });
-                } else {
-                    console.error("Không tìm thấy xe với ID:", id);
-                }
+                const matchedStatus = status.find((s) => s.id === bus.status.id);
+                console.log(matchedStatus);
+
+                setSelectedStatus(matchedStatus || null);
+
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu xe:", error);
+            } finally {
                 setLoading(false);
-            })
-            .catch((error) => {
-                console.error("Lỗi khi tải dữ liệu:", error);
-                setLoading(false);
-            });
+            }
+        };
+
+        fetchBusData();
     }, [id]);
+
+    // Dropdown bus model
+    useEffect(() => {
+        const dropdownBusModel = async () => {
+            try {
+                setLoading(true);
+                const response = await apiInstance.get("/api/system/bus/listBusModel");
+                const formattedData = response.data.data.map((item: any) => ({
+                    id: item.id,
+                    value: item.name,
+                    capacity: item.capacity,
+                }));
+                setBusModel(formattedData);
+            } catch (error) {
+                console.error("API Error:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        dropdownBusModel();
+    }, []);
+
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-
-        setFormData((prev) => {
-            if (!prev) return null;
-
-            if (name.startsWith("model.")) {
-                const field = name.split(".")[1];
-                return { ...prev, model: { ...prev.model, [field]: field === "capacity" ? Number(value) : value } };
-            }
-
-            if (name.startsWith("garage.")) {
-                const field = name.split(".")[1];
-                return { ...prev, garage: { ...prev.garage, [field]: value } };
-            }
-
-            return { ...prev, [name]: value };
-        });
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const files = Array.from(e.target.files);
-            setNewImages((prev) => [...prev, ...files]);
-
-            const filePreviews = files.map((file) => URL.createObjectURL(file));
-            setPreviewImages((prev) => [...prev, ...filePreviews]);
-        }
+        if (!e.target.files) return;
+        const files: File[] = Array.from(e.target.files).slice(0, 6);
+        const imageUrls = files.map((file) => URL.createObjectURL(file));
+        setImageFiles((prev) => [...prev, ...files].slice(0, 6));
+        setFormData((prev) => ({
+            ...prev,
+            images: [...prev.images, ...imageUrls].slice(0, 6),
+        }));
     };
 
-    const handleRemoveOldImage = (index: number) => {
-        if (formData) {
-            const updatedImages = formData.images.filter((_, i) => i !== index);
-            setFormData({ ...formData, images: updatedImages });
-        }
+    const removeImage = (index: number) => {
+        setFormData((prev) => ({
+            ...prev,
+            images: prev.images.filter((_, i) => i !== index),
+        }));
+        setImageFiles((prev) => prev.filter((_, i) => i !== index));
     };
 
-    const handleRemoveNewImage = (index: number) => {
-        const updatedNewImages = newImages.filter((_, i) => i !== index);
-        const updatedPreviewImages = previewImages.filter((_, i) => i !== index);
-        setNewImages(updatedNewImages);
-        setPreviewImages(updatedPreviewImages);
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData) return;
+        const data = new FormData();
+        data.append("bus_number", formData.bus_number);
+        data.append("model_id", selectedBusModel?.id.toString() ?? "");
+        data.append("status_id", selectedStatus?.id.toString() ?? "");
+        imageFiles.forEach((file) => {
+            data.append("images[]", file);
+        });
 
-        console.log("Dữ liệu xe đã chỉnh sửa:", formData);
-        console.log("Ảnh mới đã chọn:", newImages);
-        alert("Thông tin xe đã được cập nhật!");
+        try {
+            setLoading(true);
+            const response = await apiInstance.post(
+                `/api/system/bus/bus/${id}`,
+                data,
+                { headers: { "Content-Type": "multipart/form-data" } }
+            );
+
+            if (response.data.code === 200) {
+                showToast("Cập nhật xe thành công!", "success");
+                navigate("/admin/bus");
+            } else {
+                showToast("Có lỗi xảy ra!", "error");
+            }
+        } catch (error) {
+            console.error("API Error:", error);
+            showToast("Lỗi kết nối API", "error");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <div className="p-5">
-            <h1 className="text-2xl bg-yellow-300 font-bold mb-5 text-center p-3 rounded-t-lg">
+        <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+            <h1 className="text-3xl font-semibold text-center text-blue-600 mb-6">
                 Chỉnh Sửa Xe
             </h1>
 
-            {loading ? (
-                <p className="text-center text-gray-500">Đang tải dữ liệu...</p>
-            ) : formData ? (
-                <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-                    {/* Biển số xe */}
-                    <div>
-                        <label className="block text-sm font-medium">Biển Số Xe</label>
-                        <input
-                            type="text"
-                            name="bus_number"
-                            value={formData.bus_number}
-                            onChange={handleChange}
-                            className="w-full border p-2 rounded"
-                            required
-                        />
-                    </div>
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label className="block mb-1 font-medium">Biển Số Xe</label>
+                    <input
+                        type="text"
+                        name="bus_number"
+                        value={formData.bus_number}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded focus:outline-none focus:ring focus:border-blue-400"
+                        required
+                    />
+                </div>
 
-                    {/* Tên xe */}
-                    <div>
-                        <label className="block text-sm font-medium">Tên Xe</label>
-                        <input
-                            type="text"
-                            name="model.name"
-                            value={formData.model.name}
-                            onChange={handleChange}
-                            className="w-full border p-2 rounded"
-                            required
-                        />
-                    </div>
+                <div>
+                    <label className="block mb-1 font-medium">Trạng thái hoạt động</label>
+                    <Dropdown options={status} onChange={setSelectedStatus} selectedId={selectedStatus?.id} />
+                </div>
 
-                    {/* Sức chứa */}
-                    <div>
-                        <label className="block text-sm font-medium">Sức Chứa</label>
-                        <input
-                            type="number"
-                            name="model.capacity"
-                            value={formData.model.capacity}
-                            onChange={handleChange}
-                            className="w-full border p-2 rounded"
-                            required
-                        />
-                    </div>
+                <div>
+                    <label className="block mb-1 font-medium">Chọn Loại Xe</label>
+                    <Dropdown options={busModels} onChange={setSelectedBusModel} selectedId={selectedBusModel?.id} />
+                    <label className="block mb-1 font-medium">Số lượng ghế: {selectedBusModel?.capacity}</label>
+                </div>
 
-                    {/* Nhà xe */}
-                    <div>
-                        <label className="block text-sm font-medium">Tên Nhà Xe</label>
-                        <input
-                            type="text"
-                            name="garage.name"
-                            value={formData.garage.name}
-                            onChange={handleChange}
-                            className="w-full border p-2 rounded"
-                            required
-                        />
+                <div className="md:col-span-2">
+                    <label className="block mb-1 font-medium">Hình ảnh xe (Tối đa 6 ảnh)</label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageChange}
+                        className="w-full border p-2 rounded"
+                    />
+                    <div className="flex flex-wrap gap-3 mt-4">
+                        {formData.images.map((img, index) => (
+                            <div key={index} className="relative">
+                                <img
+                                    src={img}
+                                    alt={`Preview ${index}`}
+                                    className="w-32 h-32 object-cover rounded-lg border"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => removeImage(index)}
+                                    className="absolute top-1 right-1 bg-red-600 text-white text-xs px-2 py-1 rounded-full"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                        ))}
                     </div>
+                </div>
 
-                    {/* Mã số thuế */}
-                    <div>
-                        <label className="block text-sm font-medium">Mã Số Thuế</label>
-                        <input
-                            type="text"
-                            name="garage.tax_code"
-                            value={formData.garage.tax_code}
-                            onChange={handleChange}
-                            className="w-full border p-2 rounded"
-                        />
-                    </div>
-
-                    {/* Địa chỉ */}
-                    <div>
-                        <label className="block text-sm font-medium">Địa Chỉ</label>
-                        <input
-                            type="text"
-                            name="garage.address"
-                            value={formData.garage.address}
-                            onChange={handleChange}
-                            className="w-full border p-2 rounded"
-                            required
-                        />
-                    </div>
-
-                    {/* Số điện thoại */}
-                    <div>
-                        <label className="block text-sm font-medium">Số Điện Thoại</label>
-                        <input
-                            type="text"
-                            name="garage.phone"
-                            value={formData.garage.phone}
-                            onChange={handleChange}
-                            className="w-full border p-2 rounded"
-                            required
-                        />
-                    </div>
-
-                    {/* Ảnh hiện tại */}
-                    <div className="col-span-2">
-                        <label className="block text-sm font-medium">Ảnh Xe Hiện Tại</label>
-                        <div className="flex flex-wrap gap-2">
-                            {formData.images.map((img, index) => (
-                                <div key={index} className="relative">
-                                    <img src={img} alt="Ảnh xe" className="w-40 h-40 object-cover border rounded" />
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveOldImage(index)}
-                                        className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full"
-                                    >
-                                        ❌
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="col-span-2 text-right">
-                        <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
-                            Cập Nhật Xe
-                        </button>
-                    </div>
-                </form>
-            ) : (
-                <p className="text-center text-red-500">Không tìm thấy xe cần chỉnh sửa!</p>
-            )}
+                <div className="md:col-span-2 text-right">
+                    <button
+                        type="submit"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition"
+                    >
+                        Cập Nhật Xe
+                    </button>
+                </div>
+            </form>
         </div>
     );
 };

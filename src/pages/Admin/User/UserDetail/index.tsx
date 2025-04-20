@@ -127,6 +127,27 @@ const UserDetail = () => {
                                     ))}
                                 </div>
                             </div>
+<<<<<<< Updated upstream
+=======
+                            <div className="flex items-center">
+                                <label className="w-32 text-sm font-medium">Tình trạng:</label>
+                                <div className="flex space-x-2">
+                                    <span
+                                        className={
+                                            user.status?.id === 1
+                                                ? "text-green-500"
+                                                : user.status?.id === 2
+                                                    ? "text-yellow-500"
+                                                    : user.status?.id === 3
+                                                        ? "text-red-500"
+                                                        : "text-gray-500"
+                                        }
+                                    >
+                                        {user.status?.name}
+                                    </span>
+                                </div>
+                            </div>
+>>>>>>> Stashed changes
 
                             {/* 🔸 Nếu có vai trò Tài xế thì hiển thị thông tin liên quan */}
                             {user.roles.includes("Traffic") && (

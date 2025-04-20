@@ -4,6 +4,7 @@ import { FaChevronDown, FaChevronLeft, FaChevronRight, FaRegCalendarAlt } from '
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { vi } from 'date-fns/locale';
+import AnimatedBox from '../../../components/AnimatedBox';
 
 const Overview = () => {
   const academicData = [
@@ -39,7 +40,27 @@ const Overview = () => {
 
   return (
     <div className="ms-10 me-8">
-      <h1 className="text-3xl font-bold mb-6">Tổng quan</h1>
+
+      <h1>Đây là trang thống kê ne</h1>
+
+      <div className="ms-10 me-8">
+
+        <h1>Đây là trang thống kê ne</h1>
+        <div className="p-6 space-y-6">
+          <AnimatedBox animation="fade-up" delay={200}>
+            <h2 className="text-xl font-bold">Tiêu đề xuất hiện từ dưới lên</h2>
+          </AnimatedBox>
+
+          <AnimatedBox animation="zoom-in" delay={400}>
+            <p>Đây là đoạn văn với hiệu ứng zoom.</p>
+          </AnimatedBox>
+
+          <AnimatedBox animation="flip-left" duration={1500} >
+            <div className="bg-blue-200 w-[20%] p-4 rounded-md">Khối nội dung lật từ trái</div>
+          </AnimatedBox>
+        </div>
+      </div>
+      {/* <h1 className="text-3xl font-bold mb-6">Tổng quan</h1>
       <div className="flex gap-10 mb-3">
         <div className="flex items-center">
           <label className="mr-3 text-gray-700 font-medium">Niên khóa</label>
@@ -204,7 +225,7 @@ const Overview = () => {
             <Area type="monotone" dataKey="visits" stroke="#d97706" strokeWidth={2} fill="url(#colorVisits)" />
           </AreaChart>
         </ResponsiveContainer>
-      </div>
+      </div> */}
     </div>
   );
 };

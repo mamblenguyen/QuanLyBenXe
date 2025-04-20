@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 
+<<<<<<< Updated upstream
 interface UserFormProps {
     initialData: {
         id: string;
@@ -28,6 +29,50 @@ const EditUserForm = ({ initialData, onSubmit }: UserFormProps) => {
     const [formData, setFormData] = useState({
         ...initialData,
         roles: initialData.roles || [] // Ensure roles is always an array
+=======
+interface UserFormData {
+    name: string;
+    birthday: string;
+    gender: string;
+    phone: string;
+    email: string;
+    avatar?: File | undefined;
+    roles: { id: number }[]; // Chỉ chứa object với id
+    address: string;
+    identity_card: string;
+    identity_issue_place: string;
+    identity_issue_date: string;
+    status_id: string;
+    vehicle: string;
+    route: string;
+    license: string;
+    license_issue_date: string;
+    license_expiry_date: string;
+}
+
+const EditUserForm = () => {
+    const { setLoading } = useLoading();
+    const navigate = useNavigate();
+    const userId = useParams();
+    const [formData, setFormData] = useState<UserFormData>({
+        name: "",
+        birthday: "",
+        gender: "",
+        phone: "",
+        email: "",
+        avatar: undefined,
+        roles: [],
+        address: "",
+        identity_card: "",
+        identity_issue_place: "",
+        identity_issue_date: "",
+        status_id: "",
+        vehicle: "",
+        route: "",
+        license: "",
+        license_issue_date: "",
+        license_expiry_date: "",
+>>>>>>> Stashed changes
     });
 
     const handleChange = (
@@ -50,7 +95,60 @@ const EditUserForm = ({ initialData, onSubmit }: UserFormProps) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+<<<<<<< Updated upstream
         onSubmit(formData);
+=======
+
+        const data = new FormData();
+        data.append("name", formData.name);
+        data.append("email", formData.email);
+        data.append("phone", formData.phone);
+        data.append("address", formData.address);
+        data.append("birthday", formData.birthday);
+        data.append("gender", formData.gender);
+        data.append("identity_card", formData.identity_card);
+        data.append("identity_issue_place", formData.identity_issue_place);
+        data.append("identity_issue_date", formData.identity_issue_date);
+        data.append("status_id", formData.status_id);
+        data.append("vehicle", formData.vehicle);
+        data.append("route", formData.route);
+        data.append("license", formData.license);
+        data.append("license_issue_date", formData.license_issue_date ? formData.license_issue_date : '');
+        data.append("license_expiry_date", formData.license_expiry_date ? formData.license_expiry_date : '');
+
+        formData.roles.forEach((role) => data.append("roles[]", String(role.id)));
+
+        // Thêm ảnh vào form nếu có file
+        if (formData.avatar) {
+            data.append("avatar", formData.avatar);
+        }
+        setLoading(true);
+
+        try {
+            const response = await apiInstance.post(`/api/system/user/users/${userId.id}`, data, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            showToast("Cập nhật người dùng thành công!", "success");
+            navigate("/admin/users");
+            setErrors({});
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                showToast("Cập nhật người dùng thất bại!", "error");
+                const response = error.response;
+                if (response && response.data && response.data.errors) {
+                    const errorMessages = response.data.errors;
+                    setErrors(errorMessages); // Lưu các lỗi trả về từ API
+                } else {
+                    setErrors({ general: "Lỗi không xác định từ máy chủ." });
+                }
+            } else {
+                setErrors({ general: "Lỗi kết nối hoặc yêu cầu không thành công." });
+            }
+        } finally {
+            setLoading(false);
+
+        }
+>>>>>>> Stashed changes
     };
 
     return (
@@ -267,8 +365,36 @@ const EditUserForm = ({ initialData, onSubmit }: UserFormProps) => {
                     </>
                 )}
 
+<<<<<<< Updated upstream
                 <div className="col-span-2 text-right">
                     <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+=======
+
+                {/* Address */}
+
+
+                {/* Show driving license fields if role includes "driver" */}
+
+
+                {/* Status */}
+                <div className="mb-4 col-span-2">
+                    <label className="block text-sm font-medium">Trạng thái</label>
+                    <select
+                        name="status_id"
+                        value={formData.status_id}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded"
+                    >
+                        <option value="1">Đang hoạt động</option>
+                        <option value="2">Tạm dừng</option>
+                        <option value="3">Đã khóa</option>
+                    </select>
+                </div>
+
+                {/* Submit */}
+                <div className="col-span-2 flex justify-center mt-6">
+                    <button type="submit" className="bg-blue-500 text-white px-6 py-2 rounded">
+>>>>>>> Stashed changes
                         Cập nhật người dùng
                     </button>
                 </div>

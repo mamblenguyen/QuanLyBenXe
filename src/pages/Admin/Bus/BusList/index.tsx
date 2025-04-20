@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { FaSearch, FaEye, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
+<<<<<<< Updated upstream
 interface Model {
     id: number;
     name: string;
     capacity: number;
 }
+=======
+>>>>>>> Stashed changes
 
 interface Garage {
     id: number;
@@ -17,6 +20,7 @@ interface Garage {
 }
 
 interface Bus {
+<<<<<<< Updated upstream
     id: number;
     bus_number: string;
     model: Model;
@@ -25,13 +29,64 @@ interface Bus {
 }
 
 const BusList: React.FC = () => {
+=======
+    id: string;
+    bus_number: string;
+    model: {
+        id: string,
+        name: string,
+        capacity: number
+    };
+    status: {
+        id: number,
+        name: string
+    };
+    images: [];
+    garage?: Garage | null;
+}
+const getStatusColor = (statusName: number | null) => {
+    let statusColor = '#000';
+
+    switch (statusName) {
+        case 1:
+            statusColor = 'green';
+            break;
+        case 2:
+            statusColor = 'orange';
+            break;
+        case 3:
+            statusColor = 'red';
+            break;
+        default:
+            statusColor = '#000';
+            break;
+    }
+
+    return statusColor;
+};
+const roleMapping: Record<string, string> = {
+    Admin: "Quản trị",
+    Traffic: "Tài xế",
+    Staff: "Nhân viên bán vé",
+};
+
+const BusList: React.FC = () => {
+    const { setLoading } = useLoading();
+>>>>>>> Stashed changes
     const [buses, setBuses] = useState<Bus[]>([]);
     const [filteredBuses, setFilteredBuses] = useState<Bus[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
 
+<<<<<<< Updated upstream
+=======
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [selectedBuses, setSelectedBuses] = useState<Bus | null>(null);
+
+>>>>>>> Stashed changes
     useEffect(() => {
         const fetchBuses = async () => {
             try {
+<<<<<<< Updated upstream
                 const response = await fetch("/data/bus.json");
                 if (!response.ok) throw new Error("Không thể tải dữ liệu");
                 const jsonData = await response.json();
@@ -39,6 +94,12 @@ const BusList: React.FC = () => {
                 if (jsonData.code === 200 && Array.isArray(jsonData.data)) {
                     setBuses(jsonData.data);
                     setFilteredBuses(jsonData.data);
+=======
+                setLoading(true);
+                const response = await apiInstance.get('/api/system/bus/buses');
+                if (response.data.code === 200) {
+                    setBuses(response.data.data);
+>>>>>>> Stashed changes
                 } else {
                     throw new Error("Dữ liệu API không hợp lệ");
                 }
@@ -51,6 +112,7 @@ const BusList: React.FC = () => {
     }, []);
 
     useEffect(() => {
+<<<<<<< Updated upstream
         const filtered = buses.filter((bus) =>
             bus.bus_number.toLowerCase().includes(searchTerm.toLowerCase())
         );
@@ -59,6 +121,38 @@ const BusList: React.FC = () => {
 
     const handleDelete = (id: number) => {
         console.log("Xóa xe buýt:", id);
+=======
+        const filtered = buses.filter((bus) => {
+            const busNumber = bus.bus_number ? bus.bus_number.toLowerCase() : '';
+            const busId = bus.id ? bus.id.toString().toLowerCase() : '';
+            return (
+                busNumber.includes(searchTerm.toLowerCase()) ||
+                busId.includes(searchTerm.toLowerCase())
+            );
+        });
+        setFilteredBuses(filtered);
+    }, [searchTerm, buses]);
+
+
+    const handleDeleteClick = (user: Bus) => {
+        setSelectedBuses(user);
+        setIsPopupOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!selectedBuses) return;
+
+        try {
+            setLoading(true);
+            await apiInstance.delete(`api/system/bus/bus/${selectedBuses.id}`);
+            setBuses(buses.filter(bus => bus.id !== selectedBuses.id));
+            setIsPopupOpen(false);
+        } catch (error) {
+            console.error("Error deleting user:", error);
+        } finally {
+            setLoading(false);
+        }
+>>>>>>> Stashed changes
     };
 
     return (
@@ -90,17 +184,25 @@ const BusList: React.FC = () => {
             <table className="w-full border-collapse border border-gray-200 rounded-lg overflow-hidden">
                 <thead className="bg-blue-500 text-white">
                     <tr>
+<<<<<<< Updated upstream
                         <th className="p-3 text-left">STT</th>
                         <th className="p-3 text-left">Số xe</th>
                         <th className="p-3 text-left">Loại xe</th>
                         <th className="p-3 text-left">Sức chứa</th>
                         <th className="p-3 text-left">Nhà xe</th>
                         <th className="p-3 text-left">Địa chỉ nhà xe</th>
+=======
+                        <th className="p-3 text-left">Biển số</th>
+                        <th className="p-3 text-left">Loại xe</th>
+                        <th className="p-3 text-left">Số ghế</th>
+                        <th className="p-3 text-left">Trạng thái</th>
+>>>>>>> Stashed changes
                         <th className="p-3 text-center">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
                     {filteredBuses.length > 0 ? (
+<<<<<<< Updated upstream
                         filteredBuses.map((bus, index) => (
                             <tr key={bus.id} className="border-b border-gray-200">
                                 <td className="p-3">{index + 1}</td>
@@ -124,6 +226,43 @@ const BusList: React.FC = () => {
                                 </td>
                             </tr>
                         ))
+=======
+                        filteredBuses.map((bus) => {
+                            const statusColor = getStatusColor(bus.status?.id); // Use 'user' instead of 'teacher'
+                            return (
+                                <tr key={bus.id} className="border-b border-gray-200">
+                                    <td className="p-3">{bus.bus_number}</td>
+                                    <td className="p-3">{bus.model?.name}</td>
+                                    <td className="p-3">{bus.model?.capacity}</td>
+                                    <td className="p-3">
+                                        <div
+                                            className="inline-flex items-center justify-center px-4 py-2 rounded border gap-2 text-[15px] font-medium whitespace-nowrap"
+                                            style={{ color: statusColor, borderColor: statusColor }}
+                                        >
+                                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: statusColor }}></span>
+                                            {bus.status?.name}
+                                        </div>
+                                    </td>
+                                    <td className="p-3 text-center">
+                                        <div className="flex justify-center gap-3">
+                                            <Link to={`detail/${bus.id}`} className="text-blue-500 hover:text-blue-700">
+                                                <FaEye size={18} />
+                                            </Link>
+                                            <Link to={`/admin/bus/edit/${bus.id}`} className="text-yellow-500 hover:text-yellow-700">
+                                                <FaEdit size={18} />
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDeleteClick(bus)}
+                                                className="text-red-500 hover:text-red-700"
+                                            >
+                                                <FaTrash size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })
+>>>>>>> Stashed changes
                     ) : (
                         <tr>
                             <td colSpan={7} className="p-3 text-center text-gray-500">
@@ -133,6 +272,18 @@ const BusList: React.FC = () => {
                     )}
                 </tbody>
             </table>
+<<<<<<< Updated upstream
+=======
+
+            {/* Delete Confirmation Popup */}
+            <DeletePopup
+                isOpen={isPopupOpen}
+                onCancel={() => setIsPopupOpen(false)}
+                onConfirm={handleDeleteConfirm}
+                title="Xác nhận xóa"
+                text={`Bạn có chắc chắn muốn xóa người dùng ${selectedBuses?.bus_number}?`}
+            />
+>>>>>>> Stashed changes
         </div>
     );
 };

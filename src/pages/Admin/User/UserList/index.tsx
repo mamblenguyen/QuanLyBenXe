@@ -21,11 +21,42 @@ interface User {
     id: string;
     name: string;
     email: string;
+<<<<<<< Updated upstream
+=======
+    status: {
+        id: number;
+        name: string
+    };
+    phone: string;
+>>>>>>> Stashed changes
     created_at: string;
     roles: Role[];
     garage?: Garage | null;
 }
+<<<<<<< Updated upstream
 
+=======
+const getStatusColor = (statusName: number | null) => {
+    let statusColor = '#000';
+
+    switch (statusName) {
+        case 1:
+            statusColor = 'green';
+            break;
+        case 2:
+            statusColor = 'orange';
+            break;
+        case 3:
+            statusColor = 'red';
+            break;
+        default:
+            statusColor = '#000';
+            break;
+    }
+
+    return statusColor;
+};
+>>>>>>> Stashed changes
 const roleMapping: Record<string, string> = {
     Admin: "Quản trị",
     Traffic: "Tài xế",
@@ -116,6 +147,7 @@ const UserList: React.FC = () => {
                 </thead>
                 <tbody>
                     {filteredUsers.length > 0 ? (
+<<<<<<< Updated upstream
                         filteredUsers.map((user) => (
                             <tr key={user.id} className="border-b border-gray-200">
                                 <td className="p-3">{user.name}</td>
@@ -126,6 +158,47 @@ const UserList: React.FC = () => {
                                             <span
                                                 key={role.id}
                                                 className="bg-blue-500 text-white px-2 py-1 rounded-lg text-xs font-medium"
+=======
+                        filteredUsers.map((user) => {
+                            const statusColor = getStatusColor(user.status?.id); // Use 'user' instead of 'teacher'
+                            return (
+                                <tr key={user.id} className="border-b border-gray-200">
+                                    <td className="p-3">{user.name}</td>
+                                    <td className="p-3">{user.email}</td>
+                                    <td className="p-3">
+                                        <div className="flex flex-wrap gap-1">
+                                            {user.roles.map((role) => (
+                                                <span
+                                                    key={role.id}
+                                                    className="bg-blue-500 text-white px-2 py-1 rounded-lg text-xs font-medium"
+                                                >
+                                                    {roleMapping[role.name] || role.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </td>
+                                    <td className="p-3">
+                                        <div
+                                            className="inline-flex items-center justify-center px-4 py-2 rounded border gap-2 text-[15px] font-medium whitespace-nowrap"
+                                            style={{ color: statusColor, borderColor: statusColor }}
+                                        >
+                                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: statusColor }}></span>
+                                            {user.status?.name}
+                                        </div>
+                                    </td>
+                                    <td className="p-3">{user.phone ? user.phone : "Không có"}</td>
+                                    <td className="p-3 text-center">
+                                        <div className="flex justify-center gap-3">
+                                            <Link to={`detail/${user.id}`} className="text-blue-500 hover:text-blue-700">
+                                                <FaEye size={18} />
+                                            </Link>
+                                            <Link to={`/admin/users/edit/${user.id}`} className="text-yellow-500 hover:text-yellow-700">
+                                                <FaEdit size={18} />
+                                            </Link>
+                                            <button
+                                                onClick={() => handleDeleteClick(user)}
+                                                className="text-red-500 hover:text-red-700"
+>>>>>>> Stashed changes
                                             >
                                                 {roleMapping[role.name] || role.name}
                                             </span>

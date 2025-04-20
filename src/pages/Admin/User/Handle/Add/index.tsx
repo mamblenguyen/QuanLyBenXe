@@ -14,10 +14,17 @@ const AddUserForm = () => {
         avatar: string;
         roles: string[];
         address: string;
+<<<<<<< Updated upstream
         identityCard: string;
         identityIssuePlace: string;
         identityIssueDate: string;
         status: string;
+=======
+        identity_card: string;
+        identity_issue_place: string;
+        identity_issue_date: string;
+        status_id: string;
+>>>>>>> Stashed changes
         vehicle: string;
         route: string;
         license: string;
@@ -33,10 +40,17 @@ const AddUserForm = () => {
         avatar: "",
         roles: [],
         address: "",
+<<<<<<< Updated upstream
         identityCard: "",
         identityIssuePlace: "",
         identityIssueDate: "",
         status: "",
+=======
+        identity_card: "",
+        identity_issue_place: "",
+        identity_issue_date: "",
+        status_id: "",
+>>>>>>> Stashed changes
         vehicle: "",
         route: "",
         license: "",
@@ -64,7 +78,58 @@ const AddUserForm = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+<<<<<<< Updated upstream
         console.log("Submitted Data:", formData);
+=======
+        const data = new FormData();
+        data.append("name", formData.name);
+        data.append("email", formData.email);
+        data.append("password", "123456789"); // Cần xử lý nhập mật khẩu an toàn hơn
+        data.append("phone", formData.phone);
+        data.append("address", formData.address);
+        data.append("birthday", formData.birthday);
+        data.append("gender", formData.gender);
+        data.append("identity_card", formData.identity_card);
+        data.append("identity_issue_place", formData.identity_issue_place);
+        data.append("identity_issue_date", formData.identity_issue_date);
+        data.append("status_id", formData.status_id ? formData.status_id : "1");
+        data.append("license", formData.license);
+        data.append("license_issue_date", formData.licenseIssueDate);
+        data.append("license_expiry_date", formData.licenseExpiryDate);
+        formData.roles.forEach(role => data.append("roles[]", role));
+
+        if (formData.avatar) {
+            data.append("avatar", formData.avatar);
+        }
+        console.log(formData);
+        setLoading(true);
+
+        try {
+            const response = await apiInstance.post(`/api/system/user/users`, data, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            showToast("Tạo người dùng thành công!", "success");
+            navigate("/admin/users");
+            setErrors({});
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                showToast("Lỗi khi tạo môn học!", "error");
+
+                const response = error.response;
+                if (response && response.data && response.data.errors) {
+                    const errorMessages = response.data.errors;
+                    setErrors(errorMessages); // Lưu các lỗi trả về từ API
+                } else {
+                    setErrors({ general: "Lỗi không xác định từ máy chủ." });
+                }
+            } else {
+                setErrors({ general: "Lỗi kết nối hoặc yêu cầu không thành công." });
+            }
+        } finally {
+            setLoading(false);
+
+        }
+>>>>>>> Stashed changes
     };
 
     return (
@@ -96,6 +161,25 @@ const AddUserForm = () => {
                     </select>
                 </div>
                 <div>
+<<<<<<< Updated upstream
+=======
+                    <label className="block text-sm font-medium">Trạng thái</label>
+                    <select
+                        name="status_id"
+                        value={formData.status_id}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded"
+                    >
+                        <option value="1">Đang hoạt động</option>
+                        <option value="2">Tạm dừng</option>
+                        <option value="3">Đã khóa</option>
+
+                    </select>
+                    {/* {errors.status && <div className="text-red-500 text-xs">{errors.status[0]}</div>} */}
+                </div>
+                {/* Số điện thoại */}
+                <div>
+>>>>>>> Stashed changes
                     <label className="block text-sm font-medium">Số điện thoại</label>
                     <input type="text" name="phone" value={formData.phone} onChange={handleChange} className="w-full border p-2 rounded" />
                 </div>
