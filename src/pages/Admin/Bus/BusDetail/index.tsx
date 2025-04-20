@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 import { Trash2 } from "lucide-react";
+import apiInstance from "../../../../services/api";
 
 interface Bus {
     id: number;
@@ -28,43 +29,60 @@ const BusDetail = () => {
     const navigate = useNavigate();
     const [bus, setBus] = useState<Bus | null>(null);
     const [loading, setLoading] = useState(true);
-
     useEffect(() => {
-        const fetchBusDetail = async () => {
+        const fetchUser = async () => {
             try {
-                const response = await fetch("/data/Bus.json");
-                if (!response.ok) throw new Error("Không thể tải dữ liệu");
-
-                const jsonData = await response.json();
-                if (jsonData.code === 200 && Array.isArray(jsonData.data)) {
-                    const selectedBus = jsonData.data.find((b: Bus) => b.id === Number(id));
-                    if (selectedBus) {
-                        setBus({
-                            ...selectedBus,
-                            images: [
-                                "/images/bus1.jpg",
-                                "/images/bus2.jpg",
-                                "/images/bus3.jpg",
-                                "/images/bus4.jpg",
-                                "/images/bus5.jpg",
-                                "/images/bus6.jpg"
-                            ] // Thêm mock danh sách ảnh
-                        });
-                    } else {
-                        console.error("Không tìm thấy xe");
-                    }
+                setLoading(true);
+                const response = await apiInstance.get(`/api/system/bus/bus/${id}`);
+                if (response.data.code === 200) {
+                    setBus(response.data.data);
                 } else {
-                    throw new Error("Dữ liệu API không hợp lệ");
+                    console.error('Error fetching classes:', response.data.message);
                 }
             } catch (error) {
-                console.error("Lỗi tải dữ liệu xe:", error);
+                console.error('API Error:', error);
             } finally {
                 setLoading(false);
             }
         };
+        fetchUser();
+    }, []);
+    // useEffect(() => {
+    //     const fetchBusDetail = async () => {
+    //         try {
+    //             const response = await fetch("/data/Bus.json");
+    //             if (!response.ok) throw new Error("Không thể tải dữ liệu");
 
-        fetchBusDetail();
-    }, [id]);
+    //             const jsonData = await response.json();
+    //             if (jsonData.code === 200 && Array.isArray(jsonData.data)) {
+    //                 const selectedBus = jsonData.data.find((b: Bus) => b.id === Number(id));
+    //                 if (selectedBus) {
+    //                     setBus({
+    //                         ...selectedBus,
+    //                         images: [
+    //                             "/images/bus1.jpg",
+    //                             "/images/bus2.jpg",
+    //                             "/images/bus3.jpg",
+    //                             "/images/bus4.jpg",
+    //                             "/images/bus5.jpg",
+    //                             "/images/bus6.jpg"
+    //                         ] // Thêm mock danh sách ảnh
+    //                     });
+    //                 } else {
+    //                     console.error("Không tìm thấy xe");
+    //                 }
+    //             } else {
+    //                 throw new Error("Dữ liệu API không hợp lệ");
+    //             }
+    //         } catch (error) {
+    //             console.error("Lỗi tải dữ liệu xe:", error);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     fetchBusDetail();
+    // }, [id]);
 
     if (loading) return <p className="text-center py-5">Đang tải...</p>;
     if (!bus) return <p className="text-center py-5 text-red-500">Không tìm thấy thông tin xe</p>;

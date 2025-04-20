@@ -14,9 +14,9 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          port: 22
+          port: 24700
           script: |
-            cd /services/QuanLyBenXe
+            cd /root/services/QuanLyBenXe
             git fetch origin
             git checkout production
             git pull

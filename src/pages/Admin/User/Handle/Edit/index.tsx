@@ -1,23 +1,29 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import apiInstance from "../../../../../services/api";
-import { useNavigate, useParams } from "react-router";
-import { useLoading } from "../../../../../context/loading";
 import { showToast } from "../../../../../components/Toasted";
+import { useLoading } from "../../../../../context/loading";
+import { useNavigate, useParams } from "react-router";
+import axios from "axios";
+
+interface Role {
+    id: number;
+    name: string;
+}
 
 interface UserFormData {
+    id: string;
     name: string;
     birthday: string;
     gender: string;
     phone: string;
     email: string;
-    avatar?: File | undefined;
-    roles: { id: number }[]; // Chỉ chứa object với id
+    avatar?: File;
+    roles: Role[];
     address: string;
     identity_card: string;
     identity_issue_place: string;
     identity_issue_date: string;
-    status: string;
+    status_id: string;
     vehicle: string;
     route: string;
     license: string;
@@ -28,8 +34,11 @@ interface UserFormData {
 const EditUserForm = () => {
     const { setLoading } = useLoading();
     const navigate = useNavigate();
-    const userId = useParams();
+    const { id } = useParams<{ id: string }>();
+
+    const [errors, setErrors] = useState<any>();
     const [formData, setFormData] = useState<UserFormData>({
+        id: "",
         name: "",
         birthday: "",
         gender: "",
@@ -41,7 +50,7 @@ const EditUserForm = () => {
         identity_card: "",
         identity_issue_place: "",
         identity_issue_date: "",
-        status: "",
+        status_id: "",
         vehicle: "",
         route: "",
         license: "",
@@ -49,67 +58,93 @@ const EditUserForm = () => {
         license_expiry_date: "",
     });
 
-    const [errors, setErrors] = useState<any>({});
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
-
-    // Fetch user data
+    const roleOptions: Role[] = [
+        { id: 1, name: "Admin" },
+        { id: 2, name: "Traffic" },
+        { id: 3, name: "Staff" },
+    ];
     useEffect(() => {
-        const fetchUserData = async () => {
-            setLoading(true);
+        const fetchUser = async () => {
             try {
-                const response = await apiInstance.get(`/api/system/user/users/${userId.id}`);
+                setLoading(true);
+                const response = await apiInstance.get(`/api/system/user/users/${id}`);
                 const user = response.data.data;
+                console.log(user);
+
+                // Mapping roles to {id, name}
+                const mappedRoles = user.roles.map((roleId: number) => {
+                    const found = roleOptions.find((r) => r.id === roleId);
+                    return found ? { id: found.id, name: found.name } : null;
+                }).filter((r: Role | null): r is Role => r !== null);
+
                 setFormData({
-                    ...user,
-                    roles: user.roles || [],
+                    id: user.id,
+                    name: user.name || "",
+                    birthday: user.birthday || "",
+                    gender: user.gender || "",
+                    phone: user.phone || "",
+                    email: user.email || "",
+                    address: user.address || "",
+                    avatar: undefined,
+                    roles: mappedRoles,
+                    identity_card: user.identity_card || "",
+                    identity_issue_place: user.identity_issue_place || "",
+                    identity_issue_date: user.identity_issue_date || "",
+                    status_id: user.status_id || "",
+                    vehicle: user.vehicle || "",
+                    route: user.route || "",
+                    license: user.license || "",
+                    license_issue_date: user.license_issue_date || "",
+                    license_expiry_date: user.license_expiry_date || "",
                 });
+                console.log(formData);
 
-                if (user.avatar) {
-                    setPreviewImage(user.avatar); // Nếu có ảnh đại diện, hiển thị xem trước
-                }
-
-            } catch (error) {
-                console.error("Error fetching user data", error);
+            } catch (err) {
+                showToast("Không thể tải thông tin người dùng", "error");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchUserData();
-    }, [userId]);
+        if (id) {
+            fetchUser();
+        }
+    }, [id]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value, checked } = e.target as HTMLInputElement;
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
+        const { name, value, type, checked } = e.target as HTMLInputElement;
 
-        if (name === "roles") {
-            setFormData((prev) => {
-                // Đảm bảo prev.roles luôn là mảng chứa object { id: number }
-                const updatedRoles = checked
-                    ? [...prev.roles, { id: Number(value) }] // Thêm object có id
-                    : prev.roles.filter((role) => role.id !== Number(value)); // Xóa object có id tương ứng
+        if (type === "checkbox" && name === "roles") {
+            const roleId = roleOptions.find((r) => r.name === value)?.id;
+            if (!roleId) return;
 
-                return { ...prev, roles: updatedRoles };
-            });
+            setFormData((prev) => ({
+                ...prev,
+                roles: checked
+                    ? [...prev.roles, { id: roleId, name: value }]
+                    : prev.roles.filter((role) => role.id !== roleId),
+            }));
         } else {
             setFormData((prev) => ({ ...prev, [name]: value }));
         }
     };
 
-
-    console.log(formData.roles);
-
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setFormData((prev) => ({ ...prev, avatar: file }));
-            setPreviewImage(URL.createObjectURL(file)); // Lưu URL ảnh xem trước
+            setFormData((prev) => ({
+                ...prev,
+                avatar: file,
+            }));
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
         const data = new FormData();
+
         data.append("name", formData.name);
         data.append("email", formData.email);
         data.append("phone", formData.phone);
@@ -119,56 +154,57 @@ const EditUserForm = () => {
         data.append("identity_card", formData.identity_card);
         data.append("identity_issue_place", formData.identity_issue_place);
         data.append("identity_issue_date", formData.identity_issue_date);
-        data.append("status", formData.status);
+        data.append("status_id", formData.status_id);
         data.append("vehicle", formData.vehicle);
         data.append("route", formData.route);
         data.append("license", formData.license);
         data.append("license_issue_date", formData.license_issue_date);
         data.append("license_expiry_date", formData.license_expiry_date);
 
-        formData.roles.forEach((role) => data.append("roles[]", String(role.id)));
+        formData.roles.forEach((role) =>
+            data.append("roles[]", String(role.id))
+        );
 
-        // Thêm ảnh vào form nếu có file
         if (formData.avatar) {
             data.append("avatar", formData.avatar);
         }
-        setLoading(true);
 
+        setLoading(true);
         try {
-            const response = await apiInstance.post(`/api/system/user/users/${userId.id}`, data, {
+            await apiInstance.post(`/api/system/user/users/${id}`, data, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
             showToast("Cập nhật người dùng thành công!", "success");
             navigate("/admin/users");
-            setErrors({});
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 showToast("Cập nhật người dùng thất bại!", "error");
-                const response = error.response;
-                if (response && response.data && response.data.errors) {
-                    const errorMessages = response.data.errors;
-                    setErrors(errorMessages); // Lưu các lỗi trả về từ API
-                } else {
-                    setErrors({ general: "Lỗi không xác định từ máy chủ." });
+                if (error.response?.data?.errors) {
+                    setErrors(error.response.data.errors);
                 }
-            } else {
-                setErrors({ general: "Lỗi kết nối hoặc yêu cầu không thành công." });
             }
         } finally {
             setLoading(false);
-
         }
     };
-    const isDriver = formData.roles.some((role) => role.id === 2);
 
     return (
-        <div className="p-5">
+        <div className="max-w-full p-6 bg-white shadow-lg rounded-lg">
             <h1 className="text-2xl bg-blue-300 font-bold mb-5 text-center p-3 rounded-t-lg">
-                Chỉnh sửa người dùng
+                Cập nhật thông tin người dùng
             </h1>
-            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6" encType="multipart/form-data">
-                {/* Name */}
-                <div className="mb-4 col-span-1">
+            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
+                <div>
+                    <label className="block text-sm font-medium">Mã nhân viên</label>
+                    <input
+                        type="text"
+                        name="id"
+                        value={formData.id}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded"
+                    />
+                </div>
+                <div>
                     <label className="block text-sm font-medium">Họ và tên</label>
                     <input
                         type="text"
@@ -177,11 +213,8 @@ const EditUserForm = () => {
                         onChange={handleChange}
                         className="w-full border p-2 rounded"
                     />
-                    {errors.name && <div className="text-red-500 text-xs">{errors.name[0]}</div>}
                 </div>
-
-                {/* Birthday */}
-                <div className="mb-4">
+                <div>
                     <label className="block text-sm font-medium">Ngày sinh</label>
                     <input
                         type="date"
@@ -190,11 +223,8 @@ const EditUserForm = () => {
                         onChange={handleChange}
                         className="w-full border p-2 rounded"
                     />
-                    {errors.birthday && <div className="text-red-500 text-xs">{errors.birthday[0]}</div>}
                 </div>
-
-                {/* Gender */}
-                <div className="mb-4">
+                <div>
                     <label className="block text-sm font-medium">Giới tính</label>
                     <select
                         name="gender"
@@ -202,14 +232,25 @@ const EditUserForm = () => {
                         onChange={handleChange}
                         className="w-full border p-2 rounded"
                     >
+                        <option value="">Chọn giới tính</option>
                         <option value="Nam">Nam</option>
                         <option value="Nữ">Nữ</option>
-                        <option value="Khác">Khác</option>
                     </select>
                 </div>
-
-                {/* Phone */}
-                <div className="mb-4">
+                <div>
+                    <label className="block text-sm font-medium">Trạng thái</label>
+                    <select
+                        name="status_id"
+                        value={formData.status_id}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded"
+                    >
+                        <option value="1">Đang hoạt động</option>
+                        <option value="2">Tạm dừng</option>
+                        <option value="3">Đã khóa</option>
+                    </select>
+                </div>
+                <div>
                     <label className="block text-sm font-medium">Số điện thoại</label>
                     <input
                         type="text"
@@ -218,11 +259,8 @@ const EditUserForm = () => {
                         onChange={handleChange}
                         className="w-full border p-2 rounded"
                     />
-                    {errors.phone && <div className="text-red-500 text-xs">{errors.phone[0]}</div>}
                 </div>
-
-                {/* Email */}
-                <div className="mb-4 col-span-1">
+                <div>
                     <label className="block text-sm font-medium">Email</label>
                     <input
                         type="email"
@@ -231,42 +269,8 @@ const EditUserForm = () => {
                         onChange={handleChange}
                         className="w-full border p-2 rounded"
                     />
-                    {errors.email && <div className="text-red-500 text-xs">{errors.email[0]}</div>}
                 </div>
-                <div className="mb-4 col-span-1">
-                    <label className="block text-sm font-medium">CMND/CCCD</label>
-                    <input
-                        type="text"
-                        name="identity_card"
-                        value={formData.identity_card}
-                        onChange={handleChange}
-                        className="w-full border p-2 rounded"
-                    />
-                    {errors.identity_card && <div className="text-red-500 text-xs">{errors.identity_card[0]}</div>}
-                </div>
-                <div className="mb-4 col-span-1">
-                    <label className="block text-sm font-medium">Ngày cấp CMND/CCCD</label>
-                    <input
-                        type="date"
-                        name="identity_issue_date"
-                        value={formData.identity_issue_date}
-                        onChange={handleChange}
-                        className="w-full border p-2 rounded"
-                    />
-                    {errors.identity_issue_date && <div className="text-red-500 text-xs">{errors.identity_issue_date[0]}</div>}
-                </div>
-                <div className="mb-4 col-span-1">
-                    <label className="block text-sm font-medium">Nơi cấp CMND/CCCD</label>
-                    <input
-                        type="text"
-                        name="identity_issue_place"
-                        value={formData.identity_issue_place}
-                        onChange={handleChange}
-                        className="w-full border p-2 rounded"
-                    />
-                    {errors.identity_issue_place && <div className="text-red-500 text-xs">{errors.identity_issue_place[0]}</div>}
-                </div>
-                <div className="mb-4 col-span-1">
+                <div>
                     <label className="block text-sm font-medium">Địa chỉ</label>
                     <input
                         type="text"
@@ -275,51 +279,103 @@ const EditUserForm = () => {
                         onChange={handleChange}
                         className="w-full border p-2 rounded"
                     />
-                    {errors.address && <div className="text-red-500 text-xs">{errors.address[0]}</div>}
-
+                </div>
+                <div>
+                    <label className="block text-sm font-medium">Số CCCD</label>
+                    <input
+                        type="text"
+                        name="identity_card"
+                        value={formData.identity_card}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium">Nơi cấp</label>
+                    <input
+                        type="text"
+                        name="identity_issue_place"
+                        value={formData.identity_issue_place}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium">Ngày cấp</label>
+                    <input
+                        type="date"
+                        name="identity_issue_date"
+                        value={formData.identity_issue_date}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded"
+                    />
                 </div>
 
-                {/* Avatar */}
-                <div className="mb-4">
+                <div>
                     <label className="block text-sm font-medium">Ảnh đại diện</label>
                     <input
                         type="file"
                         name="avatar"
+                        accept="image/*"
                         onChange={handleFileChange}
                         className="w-full border p-2 rounded"
                     />
-                    {previewImage && <img src={previewImage} alt="Avatar Preview" className="mt-2 w-20 h-20" />}
+                    {formData.avatar && (
+                        <img
+                            src={URL.createObjectURL(formData.avatar)}
+                            alt="Avatar Preview"
+                            className="mt-2 w-20 h-20 object-cover rounded-full"
+                        />
+                    )}
                 </div>
 
-                {/* Roles */}
                 <div className="col-span-2">
                     <label className="block text-sm font-medium">Vai trò</label>
                     <div className="flex gap-4">
-                        {[
-                            { label: "Quản trị", value: "1" },
-                            { label: "Tài xế", value: "2" },
-                            { label: "Nhân viên bán vé", value: "3" },
-                        ].map(({ label, value }) => (
-                            <label key={value} className="flex items-center gap-2">
+                        {roleOptions.map((role) => (
+                            <label key={role.id} className="flex items-center gap-2">
                                 <input
                                     type="checkbox"
                                     name="roles"
-                                    value={value}
-                                    checked={formData.roles.some((role) => role.id === Number(value))} // So sánh đúng kiểu dữ liệu
+                                    value={role.name}
+                                    checked={formData.roles.some(r => r.id === role.id)}
                                     onChange={handleChange}
                                     className="w-4 h-4"
                                 />
-                                {label}
+                                {role.name === "Admin"
+                                    ? "Quản trị"
+                                    : role.name === "Traffic"
+                                        ? "Tài xế"
+                                        : "Nhân viên bán vé"}
                             </label>
                         ))}
                     </div>
-                    {errors.roles && <div className="text-red-500 text-xs">{errors.roles[0]}</div>}
                 </div>
-                {/* Nếu là tài xế thì hiển thị thêm các trường giấy phép */}
-                {isDriver && (
+
+                {formData.roles.some(r => r.name === "Traffic") && (
                     <>
                         <div>
-                            <label className="block text-sm font-medium">Giấy phép lái xe</label>
+                            <label className="block text-sm font-medium">Số xe</label>
+                            <input
+                                type="text"
+                                name="vehicle"
+                                value={formData.vehicle}
+                                onChange={handleChange}
+                                className="w-full border p-2 rounded"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium">Tuyến xe</label>
+                            <input
+                                type="text"
+                                name="route"
+                                value={formData.route}
+                                onChange={handleChange}
+                                className="w-full border p-2 rounded"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium">GPLX</label>
                             <input
                                 type="text"
                                 name="license"
@@ -327,9 +383,7 @@ const EditUserForm = () => {
                                 onChange={handleChange}
                                 className="w-full border p-2 rounded"
                             />
-                            {errors.license && <div className="text-red-500 text-xs">{errors.license[0]}</div>}
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium">Ngày cấp GPLX</label>
                             <input
@@ -339,9 +393,7 @@ const EditUserForm = () => {
                                 onChange={handleChange}
                                 className="w-full border p-2 rounded"
                             />
-                            {errors.license_issue_date && <div className="text-red-500 text-xs">{errors.license_issue_date[0]}</div>}
                         </div>
-
                         <div>
                             <label className="block text-sm font-medium">Ngày hết hạn GPLX</label>
                             <input
@@ -351,37 +403,16 @@ const EditUserForm = () => {
                                 onChange={handleChange}
                                 className="w-full border p-2 rounded"
                             />
-                            {errors.license_expiry_date && <div className="text-red-500 text-xs">{errors.license_expiry_date[0]}</div>}
                         </div>
                     </>
                 )}
 
-
-                {/* Address */}
-
-
-                {/* Show driving license fields if role includes "driver" */}
-
-
-                {/* Status */}
-                <div className="mb-4 col-span-2">
-                    <label className="block text-sm font-medium">Trạng thái</label>
-                    <select
-                        name="status"
-                        value={formData.status}
-                        onChange={handleChange}
-                        className="w-full border p-2 rounded"
+                <div className="col-span-2">
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded"
                     >
-                        <option value="Đang hoạt động">Đang hoạt động</option>
-                        <option value="Tạm dừng">Tạm dừng</option>
-                        <option value="Đã khóa">Đã khóa</option>
-                    </select>
-                </div>
-
-                {/* Submit */}
-                <div className="col-span-2 flex justify-center mt-6">
-                    <button type="submit" className="bg-blue-500 text-white px-6 py-2 rounded">
-                        Cập nhật người dùng
+                        Cập nhật
                     </button>
                 </div>
             </form>

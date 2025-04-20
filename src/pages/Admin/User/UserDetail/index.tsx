@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { Camera, Trash2 } from "lucide-react";
+import { Camera } from "lucide-react";
 import apiInstance from "../../../../services/api";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router-dom"; // Use 'react-router-dom' instead of 'react-router'
 import DeletePopup from "../../../../components/Popup/Delete";
 import { showToast } from "../../../../components/Toasted";
 
@@ -15,7 +15,7 @@ const roleMapping: Record<string, string> = {
 const UserDetail = () => {
     const [user, setUser] = useState<any>(null); // State to store user data
     const [loading, setLoading] = useState<boolean>(true); // State for loading status
-    const id = useParams();
+    const { id } = useParams(); // Destructure the 'id' directly from useParams
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const navigate = useNavigate();
 
@@ -23,24 +23,27 @@ const UserDetail = () => {
         const fetchUser = async () => {
             try {
                 setLoading(true);
-                const response = await apiInstance.get(`/api/system/user/users/${id?.id}`);
+                const response = await apiInstance.get(`/api/system/user/users/${id}`);
                 if (response.data.code === 200) {
                     setUser(response.data.data);
                 } else {
-                    console.error('Error fetching classes:', response.data.message);
+                    console.error('Error fetching user:', response.data.message);
+                    showToast("Không thể lấy thông tin người dùng!", "error");
                 }
             } catch (error) {
                 console.error('API Error:', error);
+                showToast("Đã xảy ra lỗi khi lấy thông tin người dùng!", "error");
             } finally {
                 setLoading(false);
             }
         };
         fetchUser();
-    }, []);
+    }, [id]);
 
     if (loading) {
         return <div>Loading...</div>; // Display a loading state
     }
+
     const handleDeleteClick = () => {
         setIsPopupOpen(true);
     };
@@ -48,7 +51,7 @@ const UserDetail = () => {
     const handleDeleteConfirm = async () => {
         try {
             setLoading(true);
-            await apiInstance.delete(`/api/system/user/users/${id?.id}`);
+            await apiInstance.delete(`/api/system/user/users/${id}`);
             showToast("Xóa người dùng thành công!", "success");
             navigate("/users");
             setIsPopupOpen(false);
@@ -84,7 +87,6 @@ const UserDetail = () => {
                     <button className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-md">
                         <Link to={`/admin/users/edit/${user.id}`} className="text-yellow-500 hover:text-yellow-700">
                             <span className="font-bold text-white">Chỉnh sửa</span>
-
                         </Link>
                     </button>
                 </div>
@@ -104,6 +106,7 @@ const UserDetail = () => {
                                 alt="Người dùng"
                                 className="w-full h-full rounded-full border-2 border-gray-300"
                             />
+                            {/* Optionally uncomment the camera button for profile image update */}
                             {/* <button className="absolute bottom--1 left-1/2 transform -translate-x-1/2 bg-gray-400 text-black p-2 rounded-full shadow-lg">
                                 <Camera size={16} />
                             </button> */}
@@ -116,7 +119,7 @@ const UserDetail = () => {
                         <div className="space-y-2">
                             <div className="flex items-center">
                                 <label className="w-32 text-sm font-medium">Mã nhân viên:</label>
-                                <span title={user.id} className="text-sm font-normal">{(user.id.substring(0, 10))}...</span>
+                                <span title={user.id} className="text-sm font-normal">{user.id.substring(0, 10)}...</span>
                             </div>
                             <div className="flex items-center">
                                 <label className="w-32 text-sm font-medium">Họ và tên:</label>
@@ -153,40 +156,35 @@ const UserDetail = () => {
                     <div>
                         <h3 className="font-bold text-blue-400 text-lg mb-2">Thông tin công việc</h3>
                         <div className="space-y-2">
-                            {/* 🔸 Hiển thị vai trò trong Badge */}
                             <div className="flex items-center">
                                 <label className="w-32 text-sm font-medium">Vai trò:</label>
                                 <div className="flex space-x-2">
-                                    {user.roles.map((role: { name: string }) => (
+                                    {user.roles.map((role: { id: string, name: string }) => (
                                         <span
-                                            key={role.name}
+                                            key={role.id}
                                             className="bg-blue-200 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full"
                                         >
-                                            {roleMapping[role.name]}
+                                            {roleMapping[role.name] || role.name}
                                         </span>
                                     ))}
                                 </div>
                             </div>
                             <div className="flex items-center">
                                 <label className="w-32 text-sm font-medium">Tình trạng:</label>
-                                <div className="flex space-x-2">
-                                    <span
-                                        className={
-                                            user.status === "Đang hoạt động"
-                                                ? "text-green-500"
-                                                : user.status === "Tạm dừng"
-                                                    ? "text-yellow-500"
-                                                    : user.status === "Đã khóa"
-                                                        ? "text-red-500"
-                                                        : "text-gray-500"
-                                        }
-                                    >
-                                        {user.status}
-                                    </span>
-                                </div>
+                                <span
+                                    className={
+                                        user.status.name === "Đang hoạt động"
+                                            ? "text-green-500"
+                                            : user.status.name === "Tạm dừng"
+                                                ? "text-yellow-500"
+                                                : "text-red-500"
+                                    }
+                                >
+                                    {user.status.name}
+                                </span>
                             </div>
 
-                            {/* 🔸 Nếu có vai trò Tài xế thì hiển thị thông tin liên quan */}
+                            {/* 🔸 Show traffic-specific info if the user is a driver */}
                             {user.roles.some((role: { name: string }) => role.name === "Traffic") && (
                                 <>
                                     <div className="flex items-center">
@@ -215,6 +213,7 @@ const UserDetail = () => {
                     </div>
                 </div>
             </div>
+
             <DeletePopup
                 isOpen={isPopupOpen}
                 onCancel={() => setIsPopupOpen(false)}
