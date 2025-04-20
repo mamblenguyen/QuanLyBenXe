@@ -3,7 +3,6 @@ import LayoutWrapper from '../components/Layouts/LayoutWrapper';
 import Overview from '../pages/Admin/Overview';
 import AdminLayout from '../components/Layouts/Admin/AdminLayout';
 import UserList from '../pages/Admin/User/UserList';
-import UserDetail from '../pages/Admin/User/UserDetail';
 import AddUserForm from '../pages/Admin/User/Handle/Add';
 import EditUserForm from '../pages/Admin/User/Handle/Edit';
 import BusStationList from '../pages/Admin/BusStation/BuStationList';
@@ -14,6 +13,7 @@ import BusList from '../pages/Admin/Bus/BusList';
 import BusDetail from '../pages/Admin/Bus/BusDetail';
 import AddBusForm from '../pages/Admin/Bus/Handle/Add';
 import UpdateBusForm from '../pages/Admin/Bus/Handle/Edit';
+import UserDetail from '../pages/Admin/User/UserDetail';
 
 const AdminRoutes: RouteObject[] = [
   {

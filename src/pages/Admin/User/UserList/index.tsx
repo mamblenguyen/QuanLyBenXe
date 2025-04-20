@@ -22,32 +22,25 @@ interface User {
     id: string;
     name: string;
     email: string;
-    status: string;
+    status: {
+        id: number;
+        name: string;
+    };
     phone: string;
     created_at: string;
     roles: Role[];
     garage?: Garage | null;
 }
-const getStatusColor = (statusName: string | null) => {
-    let statusColor = '#000';
 
-    switch (statusName) {
-        case 'Đang hoạt động':
-            statusColor = 'green';
-            break;
-        case 'Tạm dừng':
-            statusColor = 'orange';
-            break;
-        case 'Đã khóa':
-            statusColor = 'red';
-            break;
-        default:
-            statusColor = '#000';
-            break;
+const getStatusColor = (statusId: number | null) => {
+    switch (statusId) {
+        case 1: return "green";
+        case 2: return "orange";
+        case 3: return "red";
+        default: return "#000";
     }
-
-    return statusColor;
 };
+
 const roleMapping: Record<string, string> = {
     Admin: "Quản trị",
     Traffic: "Tài xế",
@@ -59,9 +52,8 @@ const UserList: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
-
     const [isPopupOpen, setIsPopupOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [selectedUsers, setSelectedUsers] = useState<User | null>(null);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -92,24 +84,26 @@ const UserList: React.FC = () => {
     }, [searchTerm, users]);
 
     const handleDeleteClick = (user: User) => {
-        setSelectedUser(user);
+        setSelectedUsers(user);
         setIsPopupOpen(true);
     };
 
     const handleDeleteConfirm = async () => {
-        if (!selectedUser) return;
+        if (!selectedUsers) return;
 
         try {
             setLoading(true);
-            await apiInstance.delete(`api/system/user/users/${selectedUser.id}`);
-            setUsers(users.filter(user => user.id !== selectedUser.id));
+            await apiInstance.delete(`api/system/user/users/${selectedUsers.id}`);
+            setUsers(users.filter(user => user.id !== selectedUsers.id));
+            setFilteredUsers(filteredUsers.filter(user => user.id !== selectedUsers.id));
             setIsPopupOpen(false);
         } catch (error) {
-            console.error("Error deleting user:", error);
+            console.error("Error deleting bus:", error);
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="max-w-full p-6 bg-white shadow-lg rounded-lg">
@@ -150,7 +144,7 @@ const UserList: React.FC = () => {
                 <tbody>
                     {filteredUsers.length > 0 ? (
                         filteredUsers.map((user) => {
-                            const statusColor = getStatusColor(user.status); // Use 'user' instead of 'teacher'
+                            const statusColor = getStatusColor(user.status?.id);
                             return (
                                 <tr key={user.id} className="border-b border-gray-200">
                                     <td className="p-3">{user.name}</td>
@@ -173,10 +167,10 @@ const UserList: React.FC = () => {
                                             style={{ color: statusColor, borderColor: statusColor }}
                                         >
                                             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: statusColor }}></span>
-                                            {user.status}
+                                            {user.status?.name}
                                         </div>
                                     </td>
-                                    <td className="p-3">{user.phone ? user.phone : "Không có"}</td>
+                                    <td className="p-3">{user.phone || "Không có"}</td>
                                     <td className="p-3 text-center">
                                         <div className="flex justify-center gap-3">
                                             <Link to={`detail/${user.id}`} className="text-blue-500 hover:text-blue-700">
@@ -203,19 +197,17 @@ const UserList: React.FC = () => {
                             </td>
                         </tr>
                     )}
-
                 </tbody>
             </table>
-
-            {/* Delete Confirmation Popup */}
             <DeletePopup
                 isOpen={isPopupOpen}
                 onCancel={() => setIsPopupOpen(false)}
                 onConfirm={handleDeleteConfirm}
                 title="Xác nhận xóa"
-                text={`Bạn có chắc chắn muốn xóa người dùng ${selectedUser?.name}?`}
+                text={`Bạn có chắc chắn muốn xóa xe ${selectedUsers?.name}?`}
             />
         </div>
+
     );
 };
 

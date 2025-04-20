@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import caretDown from "../../assets/images/caret_down.png";
 import caretDownDis from "../../assets/images/caret_down_disable.png";
 import { DropdownProps, Option } from "./type";
@@ -9,13 +9,28 @@ const Dropdown: React.FC<DropdownProps> = ({
   icon = "right",
   width = "medium",
   state = "normal",
+  value,
   onChange,
+  selectedId,
+  onClick
 }) => {
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
+  useEffect(() => {
+    if (selectedId) {
+      const option = options.find((opt) => opt.id === selectedId);
+      if (option) {
+        setSelectedOption(option);
+      }
+    }
+  }, [selectedId, options]);
+
   const handleToggleDropdown = () => {
     if (!disabled) setIsOpen(!isOpen);
+    if (onClick) {
+      onClick(); // Gọi onClick nếu có
+    }
   };
 
   const handleOptionSelect = (option: Option) => {
