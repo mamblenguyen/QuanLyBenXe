@@ -1,115 +1,199 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLoading } from "../../../../../context/loading";
+import apiInstance from "../../../../../services/api";
+import Dropdown from "../../../../../components/Dropdown";
+import { showToast } from "../../../../../components/Toasted";
+import { useNavigate } from "react-router";
+
+interface Option {
+    id: string | number;
+    value: string;
+}
 
 const AddBusStationForm = () => {
+    const { setLoading } = useLoading();
+    const navigate = useNavigate();
+
+    const [province, setProvince] = useState<Option[]>([]);
+    const [selectedProvince, setSelectedProvince] = useState<Option>();
+
+    const [district, setDistrict] = useState<Option[]>([]);
+    const [selectedDistrict, setSelectedDistrict] = useState<Option>();
+
+    const [ward, setWard] = useState<Option[]>([]);
+    const [selectedWard, setSelectedWard] = useState<Option>();
+
+    const [selectedStatus, setSelectedStatus] = useState<Option>();
     const [formData, setFormData] = useState({
-        stationId: "",
         name: "",
-        address: "",
-        phone: "",
-        numberOfRoutes: "",
-        openingHours: "",
-        closingHours: "",
-        images: [] as string[], // Mảng lưu danh sách ảnh
-        status: "",
+        address_number: ""
     });
 
-    const handleChange = (e: any) => {
+    const status: Option[] = [
+        { id: 1, value: "Đang hoạt động" },
+        { id: 2, value: "Đang sửa chữa" },
+        { id: 3, value: "Tạm ngưng" },
+    ];
+
+    useEffect(() => {
+        const fetchProvinces = async () => {
+            try {
+                setLoading(true);
+                const response = await apiInstance.get("/api/system/province/province/list/");
+                if (response.data.code === 200) {
+                    const formatted = response.data.data.map((item: any) => ({
+                        id: item.id,
+                        value: item.name,
+                    }));
+                    setProvince(formatted);
+                }
+            } catch (err) {
+                console.error("Error fetching provinces:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProvinces();
+    }, []);
+
+    useEffect(() => {
+        if (!selectedProvince) return;
+
+        const fetchDistricts = async () => {
+            try {
+                setLoading(true);
+                const response = await apiInstance.get(`/api/system/province/district/list/${selectedProvince.id}`);
+                if (response.data.code === 200) {
+                    const formatted = response.data.data.map((item: any) => ({
+                        id: item.id,
+                        value: item.name,
+                    }));
+                    setDistrict(formatted);
+                    setSelectedDistrict(undefined); // Reset district and ward
+                    setWard([]);
+                    setSelectedWard(undefined);
+                }
+            } catch (err) {
+                console.error("Error fetching districts:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchDistricts();
+    }, [selectedProvince]);
+
+    useEffect(() => {
+        if (!selectedDistrict) return;
+
+        const fetchWards = async () => {
+            try {
+                setLoading(true);
+                const response = await apiInstance.get(`/api/system/province/ward/list/${selectedDistrict.id}`);
+                if (response.data.code === 200) {
+                    const formatted = response.data.data.map((item: any) => ({
+                        id: item.id,
+                        value: item.name,
+                    }));
+                    setWard(formatted);
+                    setSelectedWard(undefined); // Reset ward
+                }
+            } catch (err) {
+                console.error("Error fetching wards:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchWards();
+    }, [selectedDistrict]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files) return;
-        const files: File[] = Array.from(e.target.files);
-        const imageUrls = files.map((file: File) => URL.createObjectURL(file));
-        setFormData(prev => ({
-            ...prev,
-            images: [...prev.images, ...imageUrls],
-        }));
-    };
-
-    const removeImage = (index: number) => {
-        setFormData(prev => ({
-            ...prev,
-            images: prev.images.filter((_, i) => i !== index),
-        }));
-    };
-
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Submitted Data:", formData);
+        const data = new FormData();
+        data.append("name", formData.name);
+        data.append("province_id", selectedProvince?.id.toString() ?? "");
+        data.append("status_id", selectedStatus?.id.toString() ?? "");
+        const address = `${formData.address_number} ${selectedWard?.value} ${selectedDistrict?.value} ${selectedProvince?.value}  `
+        data.append("address", address);
+        console.log(address);
+        try {
+            setLoading(true);
+            const response = await apiInstance.post(`/api/system/bus-station/create`, data, {
+            });
+
+            if (response.data.code === 201) {
+                showToast("Thêm bến xe thành công!", "success");
+                navigate("/admin/bus-station");
+            } else {
+                showToast("Có lỗi xảy ra!", "error");
+            }
+        } catch (error) {
+            console.error("API Error:", error);
+            showToast("Lỗi kết nối API", "error");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <div className="p-5">
-            <h1 className="text-2xl bg-blue-300 font-bold mb-5 text-center p-3 rounded-t-lg">
-                Thêm Bến Xe
+        <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+            <h1 className="text-3xl font-semibold text-center text-blue-600 mb-6">
+                Thêm Bến Xe Mới
             </h1>
-            <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
+
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-sm font-medium">Mã Bến Xe</label>
-                    <input type="text" name="stationId" value={formData.stationId} onChange={handleChange} className="w-full border p-2 rounded" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium">Tên Bến Xe</label>
-                    <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full border p-2 rounded" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium">Địa Chỉ</label>
-                    <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full border p-2 rounded" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium">Số Điện Thoại</label>
-                    <input type="text" name="phone" value={formData.phone} onChange={handleChange} className="w-full border p-2 rounded" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium">Số Tuyến Xe</label>
-                    <input type="number" name="numberOfRoutes" value={formData.numberOfRoutes} onChange={handleChange} className="w-full border p-2 rounded" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium">Giờ Mở Cửa</label>
-                    <input type="time" name="openingHours" value={formData.openingHours} onChange={handleChange} className="w-full border p-2 rounded" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium">Giờ Đóng Cửa</label>
-                    <input type="time" name="closingHours" value={formData.closingHours} onChange={handleChange} className="w-full border p-2 rounded" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium">Hình Ảnh</label>
+                    <label className="block mb-1 font-medium">Tên bến</label>
                     <input
-                        type="file"
-                        name="images"
-                        accept="image/*"
-                        multiple
-                        onChange={handleImageChange}
-                        className="w-full border p-2 rounded"
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded focus:outline-none focus:ring focus:border-blue-400"
+                        required
                     />
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {formData.images.map((img, index) => (
-                            <div key={index} className="relative">
-                                <img src={img} alt={`Preview ${index}`} className="w-60 h-60 object-cover rounded-lg" />
-                                <button
-                                    type="button"
-                                    onClick={() => removeImage(index)}
-                                    className="absolute top-0 right-0 bg-red-500 text-white text-xs p-1 rounded-full"
-                                >
-                                    X
-                                </button>
-                            </div>
-                        ))}
-                    </div>
+                </div>
+
+                <div>
+                    <label className="block mb-1 font-medium">Trạng thái hoạt động</label>
+                    <Dropdown options={status} onChange={setSelectedStatus} width="w-[9/12]" />
+                </div>
+
+                <div>
+                    <label className="block mb-1 font-medium">Tỉnh/Thành phố</label>
+                    <Dropdown options={province} onChange={setSelectedProvince} width="w-[9/12]" />
+                </div>
+
+                <div>
+                    <label className="block mb-1 font-medium">Quận/Huyện</label>
+                    <Dropdown options={district} onChange={setSelectedDistrict} width="w-[9/12]" />
+                </div>
+
+                <div>
+                    <label className="block mb-1 font-medium">Phường/Xã</label>
+                    <Dropdown options={ward} onChange={setSelectedWard} width="w-[9/12]" />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium">Trạng Thái</label>
-                    <select name="status" value={formData.status} onChange={handleChange} className="w-full border p-2 rounded">
-                        <option value="">Chọn trạng thái</option>
-                        <option value="Hoạt động">Hoạt động</option>
-                        <option value="Tạm ngừng">Tạm ngừng</option>
-                    </select>
+                    <label className="block mb-1 font-medium">Địa chỉ cụ thể</label>
+                    <input
+                        type="text"
+                        name="address_number"
+                        value={formData.address_number}
+                        onChange={handleChange}
+                        className="w-full border p-2 rounded focus:outline-none focus:ring focus:border-blue-400"
+                        required
+                    />
                 </div>
-                <div className="col-span-2 text-right">
-                    <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-                        Thêm Bến Xe
+                <div className="md:col-span-2 text-right">
+                    <button
+                        type="submit"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition"
+                    >
+                        Thêm bến xe
                     </button>
                 </div>
             </form>
