@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { FaSearch, FaEye, FaEdit, FaTrash, FaUserPlus } from "react-icons/fa";
+import { FaSearch, FaEye, FaEdit, FaTrash, FaUserPlus, FaTrashRestore } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import apiInstance from "../../../../services/api";
+import { useLoading } from "../../../../context/loading";
+import { ArchiveRestore, RefreshCcw } from "lucide-react";
+import { showToast } from "../../../../components/Toasted";
 
 interface Role {
     id: number;
@@ -15,7 +19,7 @@ interface Garage {
     phone: string;
 }
 
-interface User {
+interface BusStation {
     id: string;
     name: string;
     address: string;
@@ -23,46 +27,68 @@ interface User {
         province_id: string;
         name: string;
     };
+    status: {
+        id: number,
+        name: string
+    }
 }
+const getStatusColor = (statusId: number | null) => {
+    let statusColor = '#000';
 
-const roleMapping: Record<string, string> = {
-    Admin: "Quản trị",
-    Traffic: "Tài xế",
-    Staff: "Nhân viên bán vé",
+    switch (statusId) {
+        case 1:
+            statusColor = 'green';
+            break;
+        case 2:
+            statusColor = 'orange';
+            break;
+        case 3:
+            statusColor = 'red';
+            break;
+        default:
+            statusColor = '#000';
+            break;
+    }
+
+    return statusColor;
 };
-
 const BusStationList: React.FC = () => {
-    const [busStation, setBusStation] = useState<User[]>([]);
-    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+    const { setLoading } = useLoading();
+    const [busStation, setBusStation] = useState<BusStation[]>([]);
+    const [filteredUsers, setFilteredUsers] = useState<BusStation[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
-
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const response = await fetch("/data/BusStation.json");
-                if (!response.ok) throw new Error("Không thể tải dữ liệu");
-                const jsonData = await response.json();
-
-                if (jsonData.code === 200 && Array.isArray(jsonData.data)) {
-                    setBusStation(jsonData.data);
-                    setFilteredUsers(jsonData.data);
-                } else {
-                    throw new Error("Dữ liệu API không hợp lệ");
-                }
-            } catch (error) {
-                console.error("Lỗi tải danh sách người dùng:", error);
+    const fetchBusStation = async () => {
+        try {
+            setLoading(true);
+            const response = await apiInstance.get('/api/system/bus-station/list');
+            if (response.data.code === 200) {
+                setBusStation(response.data.data);
+                setFilteredUsers(response.data.data);
+            } else {
+                throw new Error("Dữ liệu API không hợp lệ");
             }
-        };
+        } catch (error) {
+            console.error("Lỗi tải danh sách người dùng:", error);
+        } finally {
+            setLoading(false);
 
-        fetchUsers();
+        }
+    };
+    useEffect(() => {
+
+
+        fetchBusStation();
     }, []);
 
     useEffect(() => {
-        const filtered = busStation.filter(
-            (user) =>
-                user.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredUsers(filtered);
+        const filtered = busStation.filter((bus) => {
+            const busNumber = bus?.name ? bus?.name.toLowerCase() : '';
+            const busId = bus.id ? bus.id.toString().toLowerCase() : '';
+            return (
+                busNumber.includes(searchTerm.toLowerCase()) ||
+                busId.includes(searchTerm.toLowerCase())
+            );
+        });
     }, [searchTerm, busStation]);
 
     const handleView = (id: string) => {
@@ -76,7 +102,29 @@ const BusStationList: React.FC = () => {
     const handleDelete = (id: string) => {
         console.log("Xóa user:", id);
     };
+    const handleStatusToggle = async (userId: any, currentStatusId: any) => {
+        try {
+            if (currentStatusId === 1) {
+                setLoading(true);
+                await apiInstance.put(`/api/system/bus-station/bus-stations/${userId}/soft-delete`);
+                showToast("Bến xe được chuyển về không hoạt động!", "success");
+            } else {
+                // Gọi API khôi phục
+                setLoading(true);
+                await apiInstance.put(`/api/system/bus-station/bus-stations/${userId}/restore`);
+                showToast("Bến xe được khôi phục thành công!", "success");
+            }
+            fetchBusStation();
 
+            // Reload lại danh sách nếu cần (gọi lại API hoặc cập nhật state)
+        } catch (error) {
+            showToast("Có lỗi đang xảy ra!", "error");
+            console.error(error);
+        } finally {
+            setLoading(false);
+
+        }
+    };
     return (
         <div className="max-w-full p-6 bg-white shadow-lg rounded-lg">
             <div className="flex justify-between items-center mb-4">
@@ -110,33 +158,63 @@ const BusStationList: React.FC = () => {
                         <th className="p-3 text-left">Tên bến xe</th>
                         <th className="p-3 text-left">Tỉnh thành</th>
                         <th className="p-3 text-left">Địa chỉ </th>
+                        <th className="p-3 text-left">Trạng thái </th>
+
                         <th className="p-3 text-center">Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredUsers.length > 0 ? (
-                        filteredUsers.map((user, index) => (
-                            <tr key={user.id} className="border-b border-gray-200">
-                                <td className="p-3">{index + 1}</td>
-                                <td className="p-3">{user.name}</td>
-                                <td className="p-3">{user.province.name} </td>
-                                <td className="p-3">{user.address} </td>
 
-                                <td className="p-3 text-center">
-                                    <div className="flex justify-center gap-3">
-                                        <Link to={`detail/${user.id}`} className="text-blue-500 hover:text-blue-700">
-                                            <FaEye size={18} />
-                                        </Link>
-                                        <Link to={`edit/${user.id}`} className="text-yellow-500 hover:text-yellow-700">
-                                            <FaEdit size={18} />
-                                        </Link>
-                                        <button onClick={() => handleDelete(user.id)} className="text-red-500 hover:text-red-700">
-                                            <FaTrash size={18} />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))
+
+                    {filteredUsers.length > 0 ? (
+                        filteredUsers.map((user, index) => {
+                            const statusColor = getStatusColor(user?.status?.id);
+                            return (
+                                <tr key={user.id} className="border-b border-gray-200">
+                                    <td className="p-3">{index + 1}</td>
+                                    <td className="p-3">{user?.name}</td>
+                                    <td className="p-3">{user?.province?.name} </td>
+                                    <td className="p-3">{user?.address} </td>
+                                    <td className="p-3">
+                                        <div
+                                            className="inline-flex items-center justify-center px-4 py-2 rounded border gap-2 text-[15px] font-medium whitespace-nowrap"
+                                            style={{ color: statusColor, borderColor: statusColor }}
+                                        >
+                                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: statusColor }}></span>
+                                            {user.status?.name}
+                                        </div>
+                                    </td>
+                                    <td className="p-3 text-center">
+                                        <div className="flex justify-center gap-3">
+                                            <Link to={`detail/${user.id}`} className="text-blue-500 hover:text-blue-700">
+                                                <FaEye size={18} />
+                                            </Link>
+                                            {user?.status.id === 1 ? (
+                                                <button
+                                                    title="Chuyển về trạng thái không hoạt động"
+                                                    onClick={() => handleStatusToggle(user.id, user.status.id)}
+                                                    className="text-red-500 hover:text-yellow-700"
+                                                >
+                                                    <RefreshCcw size={18} />
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    title="Khôi phục trạng thái hoạt động"
+                                                    onClick={() => handleStatusToggle(user.id, user.status.id)}
+                                                    className="text-green-500 hover:text-yellow-700"
+                                                >
+                                                    <RefreshCcw size={18} />
+                                                </button>
+                                            )}
+
+                                            {/* <button onClick={() => handleDelete(user.id)} className="text-red-500 hover:text-red-700">
+                                                <FaTrash size={18} />
+                                            </button> */}
+                                        </div>
+                                    </td>
+                                </tr>
+                            )
+                        })
                     ) : (
                         <tr>
                             <td colSpan={6} className="p-3 text-center text-gray-500">
