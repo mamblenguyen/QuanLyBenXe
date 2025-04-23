@@ -12,7 +12,7 @@ const NavBar = ({ collapsed, setCollapsed }: any) => {
     { icon: Wrench, title: 'Garage', link: '/admin/garages' },
     { icon: UserCheck, title: 'Tài xế', link: '/admin/drivers' },
     { icon: Ticket, title: 'Vé xe', link: '/admin/tickets' },
-    { icon: Map, title: 'Tuyến đường', link: '/admin/routes' },
+    { icon: Map, title: 'Tuyến đường', link: '/admin/route' },
   ];
 
   const handleMenuClick = (index: number) => {

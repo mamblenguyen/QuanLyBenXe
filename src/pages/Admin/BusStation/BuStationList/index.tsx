@@ -5,53 +5,10 @@ import apiInstance from "../../../../services/api";
 import { useLoading } from "../../../../context/loading";
 import { ArchiveRestore, RefreshCcw } from "lucide-react";
 import { showToast } from "../../../../components/Toasted";
+import { BusStation } from "../../../../types/type";
+import { getStatusColor } from "../../../../context";
 
-interface Role {
-    id: number;
-    name: string;
-}
 
-interface Garage {
-    id: number;
-    name: string;
-    tax_code: string;
-    address: string;
-    phone: string;
-}
-
-interface BusStation {
-    id: string;
-    name: string;
-    address: string;
-    province: {
-        province_id: string;
-        name: string;
-    };
-    status: {
-        id: number,
-        name: string
-    }
-}
-const getStatusColor = (statusId: number | null) => {
-    let statusColor = '#000';
-
-    switch (statusId) {
-        case 1:
-            statusColor = 'green';
-            break;
-        case 2:
-            statusColor = 'orange';
-            break;
-        case 3:
-            statusColor = 'red';
-            break;
-        default:
-            statusColor = '#000';
-            break;
-    }
-
-    return statusColor;
-};
 const BusStationList: React.FC = () => {
     const { setLoading } = useLoading();
     const [busStation, setBusStation] = useState<BusStation[]>([]);

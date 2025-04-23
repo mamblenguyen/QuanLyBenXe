@@ -119,7 +119,6 @@ const AddBusStationForm = () => {
         data.append("status_id", selectedStatus?.id.toString() ?? "");
         const address = `${formData.address_number} ${selectedWard?.value} ${selectedDistrict?.value} ${selectedProvince?.value}  `
         data.append("address", address);
-        console.log(address);
         try {
             setLoading(true);
             const response = await apiInstance.post(`/api/system/bus-station/create`, data, {
