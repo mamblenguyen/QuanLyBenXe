@@ -4,111 +4,91 @@ import DatePickerProps from './type';
 import Img from '../../assets/images/datePickerImg/u_calendar-alt.png';
 import shapeR from '../../assets/images/datePickerImg/shapeR.png';
 import shapeL from '../../assets/images/datePickerImg/shapeL.png';
+import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const DatePicker: React.FC<DatePickerProps> = ({
-  value, // value of datePicker
-  onChange, // value when changed
-  placeholder = 'Chọn ngày', // Display the placeholder
-  className = '', // class css
-  width = '647px', // Default value for width
-  height = '40px', // Default value for height
+  value,
+  onChange,
+  placeholder = 'Chọn ngày',
+  className = '',
+  width = '647px',
+  height = '40px',
 }) => {
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [isCalendarOpen, setIsCalendarOpen] = useState<boolean>(false);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const daysContainerRef = useRef<HTMLDivElement>(null);
   const datepickerContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (daysContainerRef.current) {
-      renderCalendar();
-    }
+    renderCalendar();
   }, [currentDate, isCalendarOpen]);
 
-  const renderCalendar = () => {
-    if (!daysContainerRef.current) return;
+  const formatDateValue = (date: Date) =>
+    `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}/${date.getFullYear()}`;
 
+  const handleSelectDate = (date: Date, dayDiv: HTMLDivElement) => {
+    const daysContainer = daysContainerRef.current;
+    if (daysContainer) {
+      onChange(formatDateValue(date));
+      daysContainer.querySelectorAll('div').forEach((d) => d.classList.remove('bg-blue-500', 'text-white'));
+      dayDiv.classList.add('bg-blue-500', 'text-white');
+    }
+    setIsCalendarOpen(false);
+  };
+
+  const renderCalendar = () => {
+    const daysContainer = daysContainerRef.current;
+    if (!daysContainer) return;
+
+    daysContainer.innerHTML = '';
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-    const firstDayOfMonth = new Date(year, month, 1).getDay(); // First day of the month
-    const daysInMonth = new Date(year, month + 1, 0).getDate(); // Number of days in current month
-    const daysInPrevMonth = new Date(year, month, 0).getDate(); // Number of days in last month
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
 
-    const daysContainer = daysContainerRef.current;
-    daysContainer.innerHTML = '';
+    const totalCells = 42;
 
-    // Render the days of the previous month
-    for (let i = firstDayOfMonth - 1; i >= 0; i--) {
+    for (let i = 0; i < totalCells; i++) {
       const dayDiv = document.createElement('div');
-      dayDiv.className = 'flex items-center justify-center h-10 w-10 rounded-lg cursor-pointer text-gray-400 hover:bg-blue-100 transition-colors';
-      dayDiv.textContent = (daysInPrevMonth - i).toString();
-      dayDiv.addEventListener('click', () => {
-        const selectedDate = new Date(year, month - 1, daysInPrevMonth - i); // Day of last month
-        const selectedDateValue = `${selectedDate.getDate().toString().padStart(2, '0')}/${(selectedDate.getMonth() + 1)
-          .toString()
-          .padStart(2, '0')}/${selectedDate.getFullYear()}`;
-        onChange(selectedDateValue);
-        daysContainer.querySelectorAll('div').forEach((d) => d.classList.remove('bg-blue-500', 'text-white'));
-        dayDiv.classList.add('bg-blue-500', 'text-white');
-      });
-      daysContainer.appendChild(dayDiv);
-    }
+      let date: Date;
+      if (i < firstDay) {
+        const day = daysInPrevMonth - firstDay + i + 1;
+        date = new Date(year, month - 1, day);
+        dayDiv.className =
+          'flex items-center justify-center h-10 w-10 rounded-lg cursor-pointer text-gray-400 hover:bg-blue-100 transition-colors';
+        dayDiv.textContent = `${day}`;
+      } else if (i < firstDay + daysInMonth) {
+        const day = i - firstDay + 1;
+        date = new Date(year, month, day);
+        dayDiv.className =
+          'flex items-center justify-center h-10 w-10 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors';
+        dayDiv.textContent = `${day}`;
+      } else {
+        const day = i - (firstDay + daysInMonth) + 1;
+        date = new Date(year, month + 1, day);
+        dayDiv.className =
+          'flex items-center justify-center h-10 w-10 rounded-lg cursor-pointer text-gray-400 hover:bg-blue-100 transition-colors';
+        dayDiv.textContent = `${day}`;
+      }
 
-    // Render the days of the current month
-    for (let i = 1; i <= daysInMonth; i++) {
-      const dayDiv = document.createElement('div');
-      dayDiv.className = 'flex items-center justify-center h-10 w-10 rounded-lg cursor-pointer hover:bg-blue-100  transition-colors';
-      dayDiv.textContent = i.toString();
-      dayDiv.addEventListener('click', () => {
-        const selectedDateValue = `${i.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year}`;
-        onChange(selectedDateValue);
-        daysContainer.querySelectorAll('div').forEach((d) => d.classList.remove('bg-blue-500', 'text-white'));
-        dayDiv.classList.add('bg-blue-500', 'text-white');
-      });
-      daysContainer.appendChild(dayDiv);
-    }
-
-    // Render the days of the next month
-    const totalDays = firstDayOfMonth + daysInMonth;
-    const remainingDays = 35 - totalDays;
-    for (let i = 1; i <= remainingDays; i++) {
-      const dayDiv = document.createElement('div');
-      dayDiv.className = 'flex items-center justify-center h-10 w-10 rounded-lg cursor-pointer text-gray-400 hover:bg-blue-100  transition-colors';
-      dayDiv.textContent = i.toString();
-      dayDiv.addEventListener('click', () => {
-        const selectedDate = new Date(year, month + 1, i); // Day of next month
-        const selectedDateValue = `${selectedDate.getDate().toString().padStart(2, '0')}/${(selectedDate.getMonth() + 1)
-          .toString()
-          .padStart(2, '0')}/${selectedDate.getFullYear()}`;
-        onChange(selectedDateValue);
-        daysContainer.querySelectorAll('div').forEach((d) => d.classList.remove('bg-blue-500', 'text-white'));
-        dayDiv.classList.add('bg-blue-500', 'text-white');
-      });
+      dayDiv.addEventListener('click', () => handleSelectDate(date, dayDiv));
       daysContainer.appendChild(dayDiv);
     }
   };
 
   const handlePrevMonth = () => {
-    setCurrentDate((prevDate) => {
-      const newDate = new Date(prevDate);
-      newDate.setMonth(newDate.getMonth() - 1);
-      return newDate;
-    });
+    setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
   };
 
   const handleNextMonth = () => {
-    setCurrentDate((prevDate) => {
-      const newDate = new Date(prevDate);
-      newDate.setMonth(newDate.getMonth() + 1);
-      return newDate;
-    });
-  };
-
-  const handleApply = () => {
-    setIsCalendarOpen(false);
+    setCurrentDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
 
   const handleToggleCalendar = () => {
-    setIsCalendarOpen(!isCalendarOpen);
+    setIsCalendarOpen((prev) => !prev);
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -122,12 +102,6 @@ const DatePicker: React.FC<DatePickerProps> = ({
     }
   };
 
-  const formatDateString = (date: Date) => {
-    const month = date.toLocaleDateString('vi-VN', { month: 'long' });
-    const year = date.getFullYear();
-    return `Tháng ${month.split(' ')[1]}, ${year}`;
-  };
-
   useEffect(() => {
     document.addEventListener('click', handleClickOutside);
     return () => {
@@ -135,47 +109,55 @@ const DatePicker: React.FC<DatePickerProps> = ({
     };
   }, []);
 
-  // Style functions
-  const styles = {
-    container: {
-      maxWidth: width,
-      height: height,
-    },
-  };
+  const formatDateHeader = (date: Date) =>
+    `Tháng ${date.toLocaleDateString('vi-VN', { month: 'long' }).split(' ')[1]}, ${date.getFullYear()}`;
 
   return (
-    <div className={`relative ${className}`} style={styles.container}>
-      {/* Input field */}
+    <div className={`relative ${className}`} style={{ maxWidth: width, height }}>
+      {/* Input */}
       <input
         id="datepicker"
         type="text"
-        placeholder={placeholder}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600"
         value={value || ''}
         readOnly
+        placeholder={placeholder}
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600"
         onClick={handleToggleCalendar}
       />
+
       {/* Calendar icon */}
-      <div className="absolute right-3 transform -translate-y-1/2 cursor-pointer border-l border-gray-300 border-black-text top-[21px]">
-        <img src={Img} alt="calendar" id="toggleDatepicker" onClick={handleToggleCalendar} className="h-[40px]" />
+
+
+      <div className="absolute right-3 transform -translate-y-1/2 cursor-pointer border-l border-gray-300 top-[21px]">
+        <div
+          id="toggleDatepicker"
+          onClick={handleToggleCalendar}
+          className="h-[40px] flex items-center px-2"
+        >
+          <Calendar size={24} color='blue' />
+        </div>
       </div>
+
+
 
       {/* Calendar dropdown */}
       {isCalendarOpen && (
-        <div ref={datepickerContainerRef} className="absolute z-10 mt-2 bg-white border rounded-lg shadow-lg w-full max-w-[375px] text-[16px]">
+        <div
+          ref={datepickerContainerRef}
+          className="absolute z-10 mt-2 bg-white border rounded-lg shadow-lg w-full max-w-[375px] text-[16px]"
+        >
           {/* Month navigation */}
           <div className="flex items-center justify-between p-4">
-            <button onClick={handlePrevMonth} className="p-2 rounded-ful">
-              <img src={shapeL} alt="Shape Left" className="w-2 h-3" />
+            <button onClick={handlePrevMonth} className="p-2 rounded-full">
+              <ChevronLeft className="w-4 h-4" color='red' />
             </button>
-            <span className="font-bold text-gray-900">{formatDateString(currentDate)}</span>
-            <button onClick={handleNextMonth} className="p-2 rounded-ful">
-              <img src={shapeR} alt="Shape Right" className="w-2 h-3" />
+            <span className="font-bold text-gray-900">{formatDateHeader(currentDate)}</span>
+            <button onClick={handleNextMonth} className="p-2 rounded-full">
+              <ChevronRight className="w-4 h-4" color='red' />
             </button>
           </div>
-
           {/* Days of the week */}
-          <div className="grid grid-cols-7  font-bold text-center p-2 ">
+          <div className="grid grid-cols-7 font-bold text-center p-2">
             {['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((day) => (
               <div key={day} className="text-blue-600">
                 {day}
@@ -187,11 +169,14 @@ const DatePicker: React.FC<DatePickerProps> = ({
           <div ref={daysContainerRef} className="grid grid-cols-7 text-center p-2"></div>
 
           {/* Actions */}
-          <div className="flex justify-center p-4">
-            <button onClick={handleApply} className="w-[90px] h-[40px] bg-orange-500 rounded-[5px] text-white font-medium transition-colors">
-              Chọn
-            </button>
-          </div>
+          {/* <div className="flex justify-center p-4">
+              <button
+                onClick={() => setIsCalendarOpen(false)}
+                className="w-[90px] h-[40px] bg-blue-500 rounded-[5px] text-white font-medium transition-colors"
+              >
+                Chọn
+              </button>
+            </div> */}
         </div>
       )}
     </div>
