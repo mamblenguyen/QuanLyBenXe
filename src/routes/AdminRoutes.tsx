@@ -20,6 +20,9 @@ import AddRouteForm from '../pages/Admin/Route/Handle/Route/Add';
 import AddScheduleForm from '../pages/Admin/Route/Handle/Schedule/Add';
 import EditRouteForm from '../pages/Admin/Route/Handle/Route/Edit';
 import EditScheduleForm from '../pages/Admin/Route/Handle/Schedule/Edit';
+import TicketRouteList from '../pages/Admin/Ticket/RouteList';
+import TicketDetail from '../pages/Admin/Ticket/TicketDetail';
+import BookSeat from '../pages/Admin/Ticket/handle/BookSeat';
 
 const AdminRoutes: RouteObject[] = [
   {
@@ -51,6 +54,11 @@ const AdminRoutes: RouteObject[] = [
       { path: '/admin/route/addSchedule/:id', element: <AddScheduleForm /> },
       { path: '/admin/route/edit/:id', element: <EditRouteForm /> },
       { path: '/admin/route/edit/Schedule/:id', element: <EditScheduleForm /> },
+
+      //Ticket Route
+      { path: '/admin/tickets', element: <TicketRouteList /> },
+      { path: '/admin/tickets/detail/:id', element: <TicketDetail /> },
+      { path: '/admin/tickets/book/', element: <BookSeat /> },
 
 
     ],

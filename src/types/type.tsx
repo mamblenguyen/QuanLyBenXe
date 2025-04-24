@@ -48,6 +48,7 @@ export interface Schedule {
     ticket_price: number,
     status_id: number,
     status_name: string
+    bus_model_id: number
 }
 export interface Routes {
     id: number,
@@ -74,4 +75,41 @@ export interface OneSchedule {
         id: number,
         name: string
     }
+}
+
+//Tickets
+
+
+export interface Route {
+    id: number;
+    departure_station_id: number;
+    arrival_station_id: number;
+    garage_id: number;
+    bus_id: number;
+    driver_id: string;
+    route_status_id: number;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface TicketSchedule {
+    id: number;
+    route_id: number;
+    departure_time: string;
+    arrival_time: string;
+    ticket_price: string;
+    created_at: string;
+    updated_at: string;
+    schedule_status_id: number;
+    route: Route;
+}
+
+export interface Ticket {
+    id: number;
+    name: string,
+    phone: string,
+    route: Route;
+    schedule: TicketSchedule;
+    date: string;
+    ticket_seat: number[];
 }
