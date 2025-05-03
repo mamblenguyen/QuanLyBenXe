@@ -201,7 +201,7 @@ const RouteList: React.FC = () => {
                                                             <tr key={index} className="border-t border-gray-200">
                                                                 <td className="p-2">{schedule.departure_time}</td>
                                                                 <td className="p-2">{schedule.arrival_time}</td>
-                                                                <td className="p-2">{schedule.ticket_price} VND</td>
+                                                                <td className="p-2">{parseFloat(schedule.ticket_price).toLocaleString('vi-VN')} VNĐ</td>
                                                                 <td className="p-2 text-center">
                                                                     <span
                                                                         className="inline-flex items-center gap-2 px-2 py-1 rounded border text-sm"

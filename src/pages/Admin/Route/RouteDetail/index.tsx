@@ -127,7 +127,7 @@ const RoutesDetail = () => {
                     <div className="space-y-4">
                         <div className="flex items-center">
                             <span className="w-40 font-medium text-gray-700">Giá vé:</span>
-                            <span className="text-red-600 font-bold">{routes?.schedule?.ticket_price} VND</span>
+                            <span className="text-red-600 font-bold">{parseFloat(routes?.schedule?.ticket_price).toLocaleString('vi-VN')} VNĐ</span>
                         </div>
                         <div className="flex items-center">
                             <span className="w-40 font-medium text-gray-700">Trạng thái:</span>

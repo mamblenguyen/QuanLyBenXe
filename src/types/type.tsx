@@ -45,7 +45,7 @@ export interface Schedule {
     id: number,
     departure_time: string,
     arrival_time: string,
-    ticket_price: number,
+    ticket_price: string,
     status_id: number,
     status_name: string
     bus_model_id: number
@@ -108,8 +108,17 @@ export interface Ticket {
     id: number;
     name: string,
     phone: string,
-    route: Route;
-    schedule: TicketSchedule;
+    depart_station: string,
+    depart_adress: string,
+    arrival_station: string,
+    arrival_adress: string,
+    depart_time: string,
+    arrival_time: string,
+    ticket_price: string,
+    bus_model: string,
+    status_id: number,
+    status_name: string,
+    bus_number: string,
     date: string;
     ticket_seat: number[];
 }

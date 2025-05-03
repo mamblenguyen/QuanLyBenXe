@@ -7,6 +7,7 @@ import { getStatusColor } from "../../../../context";
 import { showToast } from "../../../../components/Toasted";
 import { RefreshCcw } from "lucide-react";
 import { Routes, Ticket } from "../../../../types/type";
+import { formatDate } from "../../../../utils/FormatDate";
 
 const TicketRouteList: React.FC = () => {
     const { setLoading } = useLoading();
@@ -85,6 +86,7 @@ const TicketRouteList: React.FC = () => {
                     <tr>
                         <th className="p-3 text-left">Người đặt</th>
                         <th className="p-3 text-left">Số điện thoại</th>
+                        <th className="p-3 text-left">Ngày đặt</th>
                         <th className="p-3 text-left">Số lượng vé</th>
                         <th className="p-3 text-left">Trạng thái</th>
                         <th className="p-3 text-center">Hành động</th>
@@ -96,6 +98,7 @@ const TicketRouteList: React.FC = () => {
                             <tr key={ticket.id} className="text-black border-b border-gray-200 cursor-pointer">
                                 <td className="p-3">{ticket.name}</td>
                                 <td className="p-3">{ticket.phone}</td>
+                                <td className="p-3">{formatDate(ticket.date)}</td>
                                 <td className="p-3">{ticket.ticket_seat.length}</td>
                                 <td className="p-2">
                                     <span
