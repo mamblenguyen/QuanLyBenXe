@@ -32,4 +32,4 @@ jobs:
             docker rm react-fe || true
             docker rmi ${{ secrets.DOCKER_USERNAME }}/react-fe || true
             docker pull ${{ secrets.DOCKER_USERNAME }}/react-fe
-            docker run -d -p 80:80 --name react-fe ${{ secrets.DOCKER_USERNAME }}/react-fe
+            docker run -d -p 3000:80 --name react-fe ${{ secrets.DOCKER_USERNAME }}/react-fe
