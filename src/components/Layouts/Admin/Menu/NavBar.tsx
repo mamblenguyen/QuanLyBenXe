@@ -9,8 +9,8 @@ const NavBar = ({ collapsed, setCollapsed }: any) => {
     { icon: Users, title: 'Người dùng', link: '/admin/users' },
     { icon: Bus, title: 'Bến xe', link: '/admin/bus-station' },
     { icon: Car, title: 'Xe', link: '/admin/bus' },
-    { icon: Wrench, title: 'Garage', link: '/admin/garages' },
-    { icon: UserCheck, title: 'Tài xế', link: '/admin/drivers' },
+    // { icon: Wrench, title: 'Garage', link: '/admin/garages' },
+    // { icon: UserCheck, title: 'Tài xế', link: '/admin/drivers' },
     { icon: Ticket, title: 'Vé xe', link: '/admin/tickets' },
     { icon: Map, title: 'Tuyến đường', link: '/admin/route' },
   ];

@@ -39,7 +39,7 @@ const AddBusStationForm = () => {
         const fetchProvinces = async () => {
             try {
                 setLoading(true);
-                const response = await apiInstance.get("/api/system/province/province/list/");
+                const response = await apiInstance.get("/api/system/province/province/list");
                 if (response.data.code === 200) {
                     const formatted = response.data.data.map((item: any) => ({
                         id: item.id,

@@ -116,16 +116,16 @@ const Login: React.FC = () => {
         </div>
 
         {/* Quên mật khẩu */}
-        <div className="text-right mb-4">
+        {/* <div className="text-right mb-4">
           <Link to="/reset-password" className="text-orange-500 text-sm hover:underline">
             Quên mật khẩu?
           </Link>
-        </div>
+        </div> */}
 
         {/* Nút đăng nhập */}
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-orange-400 to-orange-600 text-white font-semibold py-2 rounded-lg hover:opacity-90 transition duration-200"
+          className="w-full bg-gradient-to-r from-blue-400 to-blue-600 text-white font-semibold py-2 rounded-lg hover:opacity-90 transition duration-200"
         >
           Đăng nhập
         </button>

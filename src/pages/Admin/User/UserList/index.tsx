@@ -59,7 +59,7 @@ const UserList: React.FC = () => {
         const fetchUsers = async () => {
             try {
                 setLoading(true);
-                const response = await apiInstance.get('api/system/user/list/');
+                const response = await apiInstance.get('api/system/user/list');
                 if (response.data.code === 200) {
                     setUsers(response.data.data);
                 } else {
