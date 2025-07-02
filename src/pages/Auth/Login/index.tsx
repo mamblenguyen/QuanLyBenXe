@@ -26,6 +26,7 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    const isSecure = window.location.protocol === 'https:'; // true nếu HTTPS
 
     try {
       const { data }: LoginResponse = await apiInstance.post('/api/system/auth/login', {
@@ -38,23 +39,26 @@ const Login: React.FC = () => {
       // Set cookies for accessToken, fullname, refreshToken, and role
       setCookie('access_token', data.token, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        secure: true,
-        sameSite: 'strict',
+        secure: isSecure,
+        sameSite: isSecure ? 'none' : 'lax',
       });
+
       setCookie('fullname', decodedToken.name, {
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        secure: true,
-        sameSite: 'strict',
+        secure: isSecure,
+        sameSite: isSecure ? 'none' : 'lax',
       });
+
       setCookie('refresh_token', data.token, {
         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        secure: true,
-        sameSite: 'strict',
+        secure: isSecure,
+        sameSite: isSecure ? 'none' : 'lax',
       });
-      setCookie('user_role', decodedToken.roles, {
+
+      setCookie('user_role', JSON.stringify(decodedToken.roles), {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        secure: true,
-        sameSite: 'strict',
+        secure: isSecure,
+        sameSite: isSecure ? 'none' : 'lax',
       });
 
       navigate('/');
