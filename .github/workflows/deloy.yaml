@@ -1,0 +1,35 @@
+name: Deploy React to EC2 via Docker
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Log in to DockerHub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build and Push Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/react-fe .
+          docker push ${{ secrets.DOCKER_USERNAME }}/react-fe
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: 54.151.156.187
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            docker stop react-fe || true
+            docker rm react-fe || true
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/react-fe || true
+            docker pull ${{ secrets.DOCKER_USERNAME }}/react-fe
+            docker run -d -p 80:80 --name react-fe ${{ secrets.DOCKER_USERNAME }}/react-fe

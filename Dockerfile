@@ -1,24 +1,19 @@
-# 1. Dùng Node.js base image
-FROM node:20-alpine
+# Stage 1: Build
+FROM node:20-alpine as build
 
-# 2. Đặt thư mục làm việc
 WORKDIR /app
 
-# 3. Sao chép các file cấu hình yarn
 COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile
 
-# 4. Cài đặt dependencies với Yarn
-RUN yarn install
-
-# 5. Sao chép toàn bộ source vào container
 COPY . .
-
-# 6. Build project cho production
 RUN yarn build
 
+# Stage 2: Serve
+FROM nginx:alpine
 
-# 10. Expose cổng 80
-EXPOSE 3000
+COPY --from=build /app/build /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# 11. Chạy nginx
-CMD ["npm", "start"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
