@@ -12,7 +12,7 @@ const apiInstance = axios.create({
         "secretkey": SECRET_KEY,
         "Content-Type": "application/json",
     },
-    withCredentials: false,
+    withCredentials: true,
 
 });
 
